@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuzla Ismail, PhD — Computational Biology &amp; Bioinformatics</title>
+<meta name="description" content="Nuzla Ismail, PhD — computational biologist and bioinformatics researcher. Genomics, gene co-expression networks, pangenome graphs, and machine learning for translational biomedicine.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:        #16243A;   /* deep navy — text & structure        */
+    --ink-soft:   #2C3A52;
+    --muted:      #5C6675;   /* secondary text                      */
+    --line:       #E3E2DC;   /* hairlines                           */
+    --paper:      #F6F7F4;   /* cool near-white page                */
+    --surface:    #FFFFFF;
+    /* viridis-derived accents — the colormap of genomics */
+    --v-deep:     #3B2F6B;   /* viridis dark (purple-blue)          */
+    --v-teal:     #21908C;   /* viridis mid (signature)             */
+    --v-green:    #3FB878;   /* viridis upper                       */
+    --v-yellow:   #C9CF3A;   /* viridis top (used very sparingly)   */
+    --accent-text:#136C63;   /* AA-contrast teal for links/labels   */
+
+    --maxw: 1140px;
+    --pad: clamp(20px, 5vw, 64px);
+    --r: 14px;
+    --shadow: 0 1px 2px rgba(22,36,58,.04), 0 12px 40px -16px rgba(22,36,58,.18);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", system-ui, sans-serif;
+    font-size:17px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:var(--accent-text); text-decoration:none}
+  a:hover{text-decoration:underline; text-underline-offset:3px}
+  :focus-visible{outline:2.5px solid var(--v-teal); outline-offset:3px; border-radius:3px}
+
+  .wrap{max-width:var(--maxw); margin:0 auto; padding-left:var(--pad); padding-right:var(--pad)}
+
+  .mono{font-family:"IBM Plex Mono", monospace}
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.74rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--muted); display:flex; align-items:center; gap:.6em; margin:0 0 1.1rem;
+  }
+  .eyebrow .node{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+
+  /* ---------- top nav ---------- */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(246,247,244,.82);
+    backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav .wrap{display:flex; align-items:center; justify-content:space-between; height:60px}
+  .brand{font-family:"Bricolage Grotesque", sans-serif; font-weight:700; font-size:1.02rem; color:var(--ink); letter-spacing:-.01em}
+  .brand span{color:var(--v-teal)}
+  .nav nav{display:flex; gap:1.6rem}
+  .nav nav a{
+    font-size:.86rem; color:var(--ink-soft); font-weight:500; letter-spacing:.01em;
+  }
+  .nav nav a:hover{color:var(--accent-text); text-decoration:none}
+  @media (max-width:760px){ .nav nav{display:none} }
+
+  /* ---------- hero ---------- */
+  .hero{padding-top:clamp(40px,7vw,84px); padding-bottom:clamp(36px,6vw,72px)}
+  .hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(28px,5vw,60px); align-items:center}
+  @media (max-width:880px){ .hero-grid{grid-template-columns:1fr; gap:8px} }
+
+  .hero h1{
+    font-family:"Bricolage Grotesque", sans-serif;
+    font-weight:800;
+    font-size:clamp(2.6rem, 6.4vw, 4.5rem);
+    line-height:.98; letter-spacing:-.025em; margin:.4rem 0 .2rem;
+    color:var(--ink);
+  }
+  .hero .role{
+    font-size:1.02rem; color:var(--ink-soft); font-weight:600; margin:.5rem 0 .1rem;
+  }
+  .hero .where{color:var(--muted); font-size:.95rem; margin:0 0 1.5rem; display:flex; align-items:center; gap:.5em; flex-wrap:wrap}
+  .hero .where .dot{width:6px;height:6px;border-radius:50%;background:var(--v-green)}
+  .thesis{
+    font-size:clamp(1.05rem,2.1vw,1.32rem); line-height:1.5; color:var(--ink-soft);
+    max-width:34ch; margin:0 0 1.8rem;
+  }
+  .thesis b{color:var(--ink); font-weight:600}
+
+  .links{display:flex; flex-wrap:wrap; gap:.6rem}
+  .links a{
+    display:inline-flex; align-items:center; gap:.5em;
+    font-family:"IBM Plex Mono",monospace; font-size:.82rem; font-weight:500;
+    padding:.5rem .85rem; border:1px solid var(--line); border-radius:999px;
+    background:var(--surface); color:var(--ink-soft);
+    transition:border-color .18s ease, color .18s ease, transform .18s ease;
+  }
+  .links a:hover{border-color:var(--v-teal); color:var(--accent-text); text-decoration:none; transform:translateY(-1px)}
+  .links a.primary{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .links a.primary:hover{background:var(--accent-text); border-color:var(--accent-text); color:#fff}
+  .links svg{width:15px;height:15px}
+
+  /* network figure */
+  .figure{position:relative; aspect-ratio:1/1; width:100%; max-width:480px; margin-inline:auto}
+  .figure svg{width:100%; height:100%; display:block; overflow:visible}
+  .figure figcaption{
+    position:absolute; right:0; bottom:-6px;
+    font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.08em;
+    color:var(--muted); text-transform:uppercase;
+  }
+  @media (max-width:880px){
+    .figure{max-width:340px; margin-top:18px; opacity:.96}
+    .figure figcaption{position:static; display:block; text-align:center; margin-top:6px}
+  }
+
+  /* ---------- sections ---------- */
+  section.block{padding:clamp(48px,7vw,86px) 0; border-top:1px solid var(--line)}
+  .block h2{
+    font-family:"Bricolage Grotesque",sans-serif; font-weight:700;
+    font-size:clamp(1.6rem,3.2vw,2.2rem); letter-spacing:-.02em; margin:0 0 1.4rem; color:var(--ink);
+  }
+  .lede{font-size:1.12rem; color:var(--ink-soft); max-width:64ch; margin:0 0 2rem}
+
+  /* focus area chips */
+  .areas{display:flex; flex-wrap:wrap; gap:.55rem; max-width:760px}
+  .areas span{
+    font-size:.86rem; padding:.4rem .8rem; border-radius:8px;
+    background:var(--surface); border:1px solid var(--line); color:var(--ink-soft);
+  }
+  .areas span b{font-weight:600; color:var(--ink)}
+
+  /* publications */
+  .pub-group{margin-bottom:2.4rem}
+  .pub-group > h3{
+    font-family:"IBM Plex Mono",monospace; font-size:.78rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); font-weight:600; margin:0 0 1.1rem; padding-bottom:.5rem; border-bottom:1px solid var(--line);
+  }
+  ol.pubs{list-style:none; margin:0; padding:0; counter-reset:p}
+  ol.pubs li{
+    position:relative; padding:.95rem 0 .95rem 2.6rem; border-bottom:1px solid var(--line);
+  }
+  ol.pubs li:last-child{border-bottom:none}
+  ol.pubs li::before{
+    counter-increment:p; content:counter(p,decimal-leading-zero);
+    position:absolute; left:0; top:1.05rem;
+    font-family:"IBM Plex Mono",monospace; font-size:.72rem; color:var(--v-teal); font-weight:600;
+  }
+  .pub-t{color:var(--ink); font-weight:500}
+  .pub-meta{display:block; margin-top:.18rem; font-size:.92rem; color:var(--muted)}
+  .pub-meta .venue{font-style:italic; color:var(--ink-soft)}
+  .pub-meta .yr{font-family:"IBM Plex Mono",monospace; color:var(--accent-text)}
+  .badge{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:.64rem; letter-spacing:.06em;
+    text-transform:uppercase; padding:.12em .5em; border-radius:5px; vertical-align:middle; margin-left:.4em;
+    background:rgba(33,144,140,.12); color:var(--accent-text); border:1px solid rgba(33,144,140,.3);
+  }
+  .badge.rev{background:rgba(59,47,107,.1); color:var(--v-deep); border-color:rgba(59,47,107,.28)}
+
+  /* timeline (experience) */
+  .timeline{position:relative; margin-left:6px}
+  .timeline::before{content:""; position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:var(--line)}
+  .tl-item{position:relative; padding:0 0 1.9rem 2.2rem}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-item::before{
+    content:""; position:absolute; left:0; top:7px; width:12px; height:12px; border-radius:50%;
+    background:var(--surface); border:2.5px solid var(--v-teal);
+  }
+  .tl-item .when{font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--muted); letter-spacing:.04em}
+  .tl-item h4{margin:.15rem 0 .1rem; font-size:1.08rem; color:var(--ink); font-weight:600; font-family:"Bricolage Grotesque",sans-serif}
+  .tl-item .org{color:var(--ink-soft); font-size:.95rem; margin-bottom:.45rem}
+  .tl-item ul{margin:.3rem 0 0; padding-left:1.1rem; color:var(--ink-soft)}
+  .tl-item li{margin:.2rem 0; font-size:.96rem}
+
+  /* two-column generic grids */
+  .cols2{display:grid; grid-template-columns:1fr 1fr; gap:clamp(28px,4vw,56px)}
+  @media (max-width:760px){ .cols2{grid-template-columns:1fr; gap:34px} }
+
+  .list-clean{list-style:none; margin:0; padding:0}
+  .list-clean li{padding:.55rem 0; border-bottom:1px solid var(--line); font-size:.98rem; color:var(--ink-soft); display:flex; justify-content:space-between; gap:1rem}
+  .list-clean li:last-child{border-bottom:none}
+  .list-clean li .yr{font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--muted); white-space:nowrap}
+
+  .skills dt{font-family:"IBM Plex Mono",monospace; font-size:.76rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-text); margin-top:1.1rem}
+  .skills dd{margin:.3rem 0 0; color:var(--ink-soft); font-size:.98rem}
+
+  /* contact / footer */
+  .contact{background:var(--ink); color:#E9EDF3; border-top:none}
+  .contact h2{color:#fff}
+  .contact .lede{color:#B9C2D0}
+  .contact a{color:#7FD8C8}
+  .contact .links a{background:transparent; border-color:rgba(255,255,255,.2); color:#E9EDF3}
+  .contact .links a:hover{border-color:#7FD8C8; color:#fff}
+  .contact .links a.primary{background:#7FD8C8; color:var(--ink); border-color:#7FD8C8}
+  .foot{padding:24px 0 40px; color:#8C97A6; font-size:.82rem; font-family:"IBM Plex Mono",monospace}
+
+  /* scroll reveal */
+  .reveal{opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1; transform:none}
+  @media (prefers-reduced-motion: reduce){ .reveal{opacity:1; transform:none; transition:none} }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand">Nuzla Ismail<span>.</span></div>
+    <nav>
+      <a href="#research">Research</a>
+      <a href="#publications">Publications</a>
+      <a href="#experience">Experience</a>
+      <a href="#teaching">Teaching</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow"><span class="node" style="background:var(--v-teal)"></span>Computational Biology · Bioinformatics</p>
+        <h1>Nuzla Ismail</h1>
+        <p class="role">PhD · Postdoctoral Fellow, Tulane University School of Medicine</p>
+        <p class="where"><span class="dot"></span> Buffalo, NY, USA · open to faculty, scientist &amp; industry roles</p>
+        <p class="thesis">I build computational methods — <b>co-expression networks</b>, <b>genome graphs</b>, and <b>machine learning</b> — that turn high-dimensional genomic data into translational insight.</p>
+        <div class="links">
+		  <a class="primary" href="Nuzla_Ismail_Academic_CV.pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+            Download CV
+          </a>
+          <a href="mailto:hello@nuzlaismail.net">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            Email
+          </a>
+          <a href="https://scholar.google.com/citations?user=qWc9OnAAAAAJ&hl=en" target="_blank" rel="noopener">Google&nbsp;Scholar</a>
+          <a href="https://orcid.org/0000-0002-0716-1478" target="_blank" rel="noopener">ORCID</a>
+          <a href="https://github.com/nuzla" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+      <figure class="figure">
+        <svg id="net" viewBox="0 0 460 460" role="img" aria-label="Illustration of a gene co-expression network: clusters of nodes connected by edges, colored along the viridis scale."></svg>
+        <figcaption>gene co-expression network · modules</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section class="block" id="research">
+    <div class="wrap reveal">
+      <p class="eyebrow"><span class="node" style="background:var(--v-deep)"></span>Research</p>
+      <h2>What I work on</h2>
+      <p class="lede">My work sits at the intersection of computational methods, big data, and translational biomedical science. I model gene regulation and disease dynamics from large genomic datasets — and I build the reproducible tooling that makes those analyses portable and repeatable. Lately my focus has been moving toward single-cell and spatial transcriptomics in mucosal immunology and infectious disease.</p>
+      <div class="areas">
+        <span><b>Gene co-expression networks</b> · WGCNA, GTEx v10</span>
+        <span><b>Pangenome graphs</b> · variant identification</span>
+        <span><b>Single-cell &amp; spatial</b> · Seurat, Scanpy</span>
+        <span><b>Machine learning</b> · deep learning, XAI</span>
+        <span><b>Mucosal immunology</b> · COVID-19, RSV, IBD</span>
+        <span><b>Reproducible workflows</b> · containers, Nextflow</span>
+        <span><b>Foundation models</b> for genomics</span>
+        <span><b>Regulatory genomics</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATIONS -->
+  <section class="block" id="publications">
+    <div class="wrap reveal">
+      <p class="eyebrow"><span class="node" style="background:var(--v-teal)"></span>Publications</p>
+      <h2>Selected work</h2>
+      <p class="lede">A selection across genomics, networks, and machine learning. The full record — including citation counts — lives on <a href="https://scholar.google.com/citations?user=qWc9OnAAAAAJ&hl=en" target="_blank" rel="noopener">Google&nbsp;Scholar</a>.</p>
+
+      <div class="pub-group">
+        <h3>Peer-Reviewed Journal Articles</h3>
+        <ol class="pubs">
+          <li>
+            <span class="pub-t">Deep learning for regulatory genomics: a survey of models, challenges, and applications</span>
+            <span class="pub-meta">Ismail, F. N., Sengupta, A., &amp; Amarasoma, S. — <span class="venue">Bioinformatics Advances</span> 6(1), vbaf271 · <span class="yr">2026</span> · <a href="https://doi.org/10.1093/bioadv/vbaf271" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">AI-driven methane emission prediction in rice paddies: a machine learning and explainability framework</span>
+            <span class="pub-meta">Sengupta, A., Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Methane</span> 4(4), 28 · <span class="yr">2025</span> · <a href="https://doi.org/10.3390/methane4040028" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">MARS: simplifying bioinformatics workflows through a containerized approach to tool integration and management</span>
+            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Bioinformatics Advances</span> 5(1), vbaf074 · <span class="yr">2025</span> · <a href="https://doi.org/10.1093/bioadv/vbaf074" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">Atmospheric modeling for wildfire prediction</span>
+            <span class="pub-meta">Ismail, F. N., Woodford, B. J., &amp; Licorish, S. A. — <span class="venue">Atmosphere</span> 16(4), 441 · <span class="yr">2025</span> · <a href="https://doi.org/10.3390/atmos16040441" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">An assessment of existing wildfire danger indices in comparison to one-class machine learning models</span>
+            <span class="pub-meta">Ismail, F. N., Woodford, B. J., Licorish, S. A., &amp; Miller, A. D. — <span class="venue">Natural Hazards</span> · <span class="yr">2024</span> · <a href="https://doi.org/10.1007/s11069-024-06738-3" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">Pangenome graphs in infectious disease: a comprehensive genetic variation analysis of <i>Neisseria meningitidis</i></span>
+            <span class="pub-meta">Yang, Z., Guarracino, A., Biggs, P. J., Ismail, F. N., et al. — <span class="venue">Frontiers in Genetics</span> 14, 1225248 · <span class="yr">2023</span> · <a href="https://doi.org/10.3389/fgene.2023.1225248" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">One-class classification-based machine learning model for estimating the probability of wildfire risk</span>
+            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Procedia Computer Science</span> 222, 341–352 · <span class="yr">2023</span> · <a href="https://doi.org/10.1016/j.procs.2023.08.173" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">Recent trends and tools in pangenome graph analysis: a comprehensive review</span>
+            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Pathogens</span> (MDPI) <span class="badge">in press</span></span>
+          </li>
+        </ol>
+      </div>
+
+      <div class="pub-group">
+        <h3>Selected Conference Proceedings</h3>
+        <ol class="pubs">
+          <li>
+            <span class="pub-t">An integrated genomics workflow tool: simulating reads, evaluating read alignments, and optimizing variant calling algorithms</span>
+            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">12th ICBCB</span>, 49–56 · <span class="yr">2024</span> · <a href="https://doi.org/10.1109/ICBCB61507.2024.11012112" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">A comparison of one-class versus two-class machine learning models for wildfire prediction in California</span>
+            <span class="pub-meta">Ismail, F. N., Sengupta, A., Woodford, B. J., &amp; Licorish, S. A. — <span class="venue">AusDM, Springer</span>, 239–253 · <span class="yr">2023</span> · <a href="https://doi.org/10.1007/978-981-99-8696-5_17" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">Evaluating the boundaries of big data environments for machine learning</span>
+            <span class="pub-meta">Ismail, F. N., Woodford, B. J., &amp; Licorish, S. A. — <span class="venue">AI 2019: Advances in Artificial Intelligence, Springer</span>, 253–264 · <span class="yr">2019</span> · <a href="https://doi.org/10.1007/978-3-030-35288-2_21" target="_blank" rel="noopener">doi</a></span>
+          </li>
+        </ol>
+      </div>
+
+      <div class="pub-group">
+        <h3>Under Review / In Preparation</h3>
+        <ol class="pubs">
+          <li>
+            <span class="pub-t">Generative AI for bioinformatics: foundations, applications, tools, and future directions</span>
+            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Briefings in Bioinformatics</span> <span class="badge rev">under review</span></span>
+          </li>
+          <li>
+            <span class="pub-t">Revolutionising bacterial genomics: graph-based strategies for improved variant identification</span>
+            <span class="pub-meta">Ismail, F. N., &amp; Sengupta, A. — <span class="venue">12th Intl. Symp. on Applied Computing for Software and Smart Systems</span> · <a href="https://arxiv.org/abs/2505.07919" target="_blank" rel="noopener">arXiv:2505.07919</a></span>
+          </li>
+          <li>
+            <span class="pub-t">Big data blueprint architecture for large organisations</span>
+            <span class="pub-meta">Ismail, F. N., Sengupta, A., &amp; Amarasoma, S. — <span class="venue">24th Industrial Conf. on Data Mining</span> · <a href="https://arxiv.org/abs/2505.04717" target="_blank" rel="noopener">arXiv:2505.04717</a></span>
+          </li>
+          <li>
+            <span class="pub-t">The power of one-class classification models in wildfire risk prediction</span>
+            <span class="pub-meta">Ismail, F. N., Woodford, B. J., &amp; Licorish, S. A. — <span class="venue">International Journal of Wildland Fire</span> <span class="badge rev">under review</span></span>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="block" id="experience">
+    <div class="wrap reveal">
+      <p class="eyebrow"><span class="node" style="background:var(--v-green)"></span>Experience</p>
+      <h2>Appointments</h2>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="when">Dec 2025 – Present</div>
+          <h4>Postdoctoral Fellow — Gastroenterology &amp; Hepatology</h4>
+          <div class="org">Tulane University School of Medicine, New Orleans, LA (remote)</div>
+          <ul>
+            <li>Investigate mucosal immunology in infectious and gastrointestinal disease (COVID-19, RSV, IBD, colorectal cancer).</li>
+            <li>Apply single-cell and spatial transcriptomic approaches to disease pathogenesis and therapeutic targets.</li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="when">Jan 2025 – Nov 2025</div>
+          <h4>Postdoctoral Research Fellow — Department of Mathematics</h4>
+          <div class="org">State University of New York at Buffalo, NY</div>
+          <ul>
+            <li>Applied bioinformatics and computational biology to dissect complex genetic networks.</li>
+            <li>Built predictive models for disease dynamics using advanced statistical and ML methods.</li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="when">Mar 2022 – Oct 2023</div>
+          <h4>Postdoctoral Research Fellow — Department of Biochemistry</h4>
+          <div class="org">University of Otago, Dunedin, New Zealand</div>
+          <ul>
+            <li>Developed and evaluated genome graph analytic tools; enhanced structural variant detection in admixed populations.</li>
+            <li>Led genetic variation analysis of <i>Neisseria meningitidis</i>; built genome graphs for the endangered kākāpō.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHING + AWARDS -->
+  <section class="block" id="teaching">
+    <div class="wrap reveal">
+      <div class="cols2">
+        <div>
+          <p class="eyebrow"><span class="node" style="background:var(--v-deep)"></span>Teaching</p>
+          <h2>Teaching &amp; mentorship</h2>
+          <p class="lede" style="font-size:1rem">Certified <b>Carpentries Instructor</b> (2023–present) across Data, Library &amp; Software Carpentry — evidence-based instruction in data analysis, programming, and reproducible research. Founder and past president of the Auston Robotics Club, mentoring teams to the World Robot Olympiad.</p>
+          <p class="eyebrow" style="margin-top:2rem"><span class="node" style="background:var(--v-teal)"></span>Education</p>
+          <ul class="list-clean">
+            <li><span>PhD, Information Science — University of Otago</span><span class="yr">2022</span></li>
+            <li><span>BEng (Hons), Software Engineering — Staffordshire University</span><span class="yr">2015</span></li>
+            <li><span>BSc, Applied Science — University of Sri Jayewardenepura</span><span class="yr">2015</span></li>
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow"><span class="node" style="background:var(--v-green)"></span>Recognition</p>
+          <h2>Awards &amp; grants</h2>
+          <ul class="list-clean">
+            <li><span>UUP Individual Development Award</span><span class="yr">2025</span></li>
+            <li><span>NITMB Convergence Conference Travel Award</span><span class="yr">2025</span></li>
+            <li><span>ACM Richard Tapia Diversity in Computing Award</span><span class="yr">2017</span></li>
+            <li><span>University of Otago Doctoral Scholarship</span><span class="yr">2017</span></li>
+            <li><span>Google Anita Borg Memorial Scholarship</span><span class="yr">2014</span></li>
+            <li><span>CERN Port Humanitarian Hackathon Scholar</span><span class="yr">2016</span></li>
+          </ul>
+          <p class="eyebrow" style="margin-top:2rem"><span class="node" style="background:var(--v-deep)"></span>Toolkit</p>
+          <dl class="skills">
+            <dt>Languages</dt><dd>Python, R, Unix, SQL, Java, C/C++</dd>
+            <dt>Bioinformatics</dt><dd>Genome &amp; pangenome graphs, WGCNA, GTEx workflows, variant calling, Seurat, Scanpy</dd>
+            <dt>ML / Data</dt><dd>Deep learning, XAI, ensembles, Docker, Singularity, Nextflow, HPC</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block contact" id="contact">
+    <div class="wrap reveal">
+      <p class="eyebrow" style="color:#7FD8C8"><span class="node" style="background:#7FD8C8"></span>Contact</p>
+      <h2>Let's work together</h2>
+      <p class="lede">I'm exploring faculty, scientist, and industry roles in computational biology, genomics, and single-cell / spatial transcriptomics. Reach out about collaborations, positions, or talks.</p>
+      <div class="links">
+        <a class="primary" href="mailto:hello@nuzlaismail.net">hello@nuzlaismail.net</a>
+          <a href="https://scholar.google.com/citations?user=qWc9OnAAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
+        <a href="https://orcid.org/0000-0002-0716-1478" target="_blank" rel="noopener">ORCID</a>
+        <a href="https://github.com/nuzla" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="wrap foot">© <span id="yr"></span> Nuzla Ismail, PhD · Buffalo, NY</div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* ---- viridis-colored gene co-expression network ---- */
+  var svg = document.getElementById('net');
+  var NS = 'http://www.w3.org/2000/svg';
+  var W = 460, H = 460;
+  // viridis stops, dark -> light
+  var viridis = ['#440154','#3b528b','#21908c','#5dc863','#addc30'];
+  // module centers (clusters), each pulls a viridis color
+  var modules = [
+    {x:150, y:140, c:viridis[1], n:9},
+    {x:310, y:120, c:viridis[2], n:8},
+    {x:120, y:320, c:viridis[3], n:8},
+    {x:330, y:320, c:viridis[2], n:7},
+    {x:235, y:235, c:viridis[4], n:6}  // hub module, center
+  ];
+  var nodes = [], i, m, k;
+  for (m=0; m<modules.length; m++){
+    var mod = modules[m];
+    for (k=0; k<mod.n; k++){
+      var ang = Math.random()*Math.PI*2;
+      var rad = 18 + Math.random()*52;
+      nodes.push({
+        x: mod.x + Math.cos(ang)*rad,
+        y: mod.y + Math.sin(ang)*rad,
+        r: 3 + Math.random()*4.5,
+        c: mod.c, mod:m,
+        ph: Math.random()*Math.PI*2,
+        amp: 1.5 + Math.random()*2.5
+      });
+    }
+  }
+  // edges: within-module dense, between-module sparse via hubs
+  var edges = [];
+  for (i=0;i<nodes.length;i++){
+    for (var j=i+1;j<nodes.length;j++){
+      var dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+      var d=Math.sqrt(dx*dx+dy*dy);
+      var sameMod = nodes[i].mod===nodes[j].mod;
+      if (sameMod && d<70 && Math.random()<0.55) edges.push([i,j,0.5]);
+      else if (!sameMod && d<150 && Math.random()<0.05) edges.push([i,j,0.22]);
+    }
+  }
+
+  var gE = document.createElementNS(NS,'g');
+  var gN = document.createElementNS(NS,'g');
+  svg.appendChild(gE); svg.appendChild(gN);
+
+  var edgeEls = edges.map(function(e){
+    var ln = document.createElementNS(NS,'line');
+    ln.setAttribute('stroke', '#16243A');
+    ln.setAttribute('stroke-opacity', e[2]*0.5);
+    ln.setAttribute('stroke-width', '1');
+    gE.appendChild(ln);
+    return ln;
+  });
+  var nodeEls = nodes.map(function(nd, idx){
+    var c = document.createElementNS(NS,'circle');
+    c.setAttribute('r', reduce ? nd.r : 0.01);
+    c.setAttribute('fill', nd.c);
+    c.setAttribute('cx', nd.x); c.setAttribute('cy', nd.y);
+    c.setAttribute('stroke', '#F6F7F4'); c.setAttribute('stroke-width','1.2');
+    gN.appendChild(c);
+    if (!reduce){
+      // staggered grow-in
+      setTimeout(function(){
+        c.style.transition = 'r .5s cubic-bezier(.2,.8,.2,1)';
+        c.setAttribute('r', nd.r);
+      }, 120 + idx*22);
+    }
+    return c;
+  });
+
+  function place(){
+    for (var e=0;e<edges.length;e++){
+      var a=nodes[edges[e][0]], b=nodes[edges[e][1]];
+      edgeEls[e].setAttribute('x1',a.cx); edgeEls[e].setAttribute('y1',a.cy);
+      edgeEls[e].setAttribute('x2',b.cx); edgeEls[e].setAttribute('y2',b.cy);
+    }
+    for (var n=0;n<nodes.length;n++){
+      nodeEls[n].setAttribute('cx', nodes[n].cx);
+      nodeEls[n].setAttribute('cy', nodes[n].cy);
+    }
+  }
+  // init positions
+  nodes.forEach(function(n){ n.cx=n.x; n.cy=n.y; });
+  place();
+
+  if (!reduce){
+    var t0 = performance.now();
+    function tick(now){
+      var t=(now-t0)/1000;
+      for (var n=0;n<nodes.length;n++){
+        var nd=nodes[n];
+        nd.cx = nd.x + Math.cos(t*0.35 + nd.ph)*nd.amp;
+        nd.cy = nd.y + Math.sin(t*0.45 + nd.ph)*nd.amp;
+      }
+      place();
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ---- scroll reveal ---- */
+  if ('IntersectionObserver' in window && !reduce){
+    var io = new IntersectionObserver(function(ents){
+      ents.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+    }, {threshold:.12});
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+})();
+</script>
+</body>
+</html>
