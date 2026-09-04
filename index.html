@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nuzla Ismail, PhD — Computational Biology &amp; Bioinformatics</title>
-<meta name="description" content="Nuzla Ismail, PhD — computational biologist and bioinformatics researcher. Genomics, gene co-expression networks, pangenome graphs, and machine learning for translational biomedicine.">
+<meta name="description" content="Nuzla Ismail, PhD — computational biologist building a research program in single-cell and spatial transcriptomics, mucosal immunology, gene co-expression networks, and pangenome graphs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -138,6 +138,24 @@
   }
   .areas span b{font-weight:600; color:var(--ink)}
 
+  /* research projects */
+  .projs{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+  @media (max-width:760px){ .projs{grid-template-columns:1fr} }
+  .proj{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--r);
+    padding:1.15rem 1.25rem 1.25rem;
+  }
+  .proj .when{
+    font-family:"IBM Plex Mono",monospace; font-size:.7rem; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--v-teal); font-weight:600;
+  }
+  .proj h3{
+    font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.05rem;
+    letter-spacing:-.01em; margin:.3rem 0 .35rem; color:var(--ink);
+  }
+  .proj p{margin:0; font-size:.95rem; line-height:1.55; color:var(--ink-soft)}
+  .proj .with{display:block; margin-top:.6rem; font-size:.86rem; color:var(--muted)}
+
   /* publications */
   .pub-group{margin-bottom:2.4rem}
   .pub-group > h3{
@@ -215,6 +233,7 @@
     <div class="brand">Nuzla Ismail<span>.</span></div>
     <nav>
       <a href="#research">Research</a>
+      <a href="#projects">Projects</a>
       <a href="#publications">Publications</a>
       <a href="#experience">Experience</a>
       <a href="#teaching">Teaching</a>
@@ -232,7 +251,7 @@
         <h1>Nuzla Ismail</h1>
         <p class="role">PhD · Postdoctoral Fellow, Tulane University School of Medicine</p>
         <p class="where"><span class="dot"></span> Buffalo, NY, USA · open to faculty, scientist &amp; industry roles</p>
-        <p class="thesis">I build computational methods — <b>co-expression networks</b>, <b>genome graphs</b>, and <b>machine learning</b> — that turn high-dimensional genomic data into translational insight.</p>
+        <p class="thesis">I build computational methods — <b>single-cell &amp; spatial transcriptomics</b>, <b>co-expression networks</b>, <b>genome graphs</b> — and apply them to <b>mucosal immunology</b> and infectious disease.</p>
         <div class="links">
 		  <a class="primary" href="Nuzla_Ismail_Academic_CV.pdf">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
@@ -259,7 +278,7 @@
     <div class="wrap reveal">
       <p class="eyebrow"><span class="node" style="background:var(--v-deep)"></span>Research</p>
       <h2>What I work on</h2>
-      <p class="lede">My work sits at the intersection of computational methods, big data, and translational biomedical science. I model gene regulation and disease dynamics from large genomic datasets — and I build the reproducible tooling that makes those analyses portable and repeatable. Lately my focus has been moving toward single-cell and spatial transcriptomics in mucosal immunology and infectious disease.</p>
+      <p class="lede">My work sits at the intersection of computational methods, big data, and translational biomedical science. I am building a research program in single-cell and spatial transcriptomics, applied to mucosal immunology in infectious and gastrointestinal disease — alongside the network, genome-graph, and machine-learning methods that underpin it, and the reproducible tooling that makes those analyses portable and repeatable.</p>
       <div class="areas">
         <span><b>Gene co-expression networks</b> · WGCNA, GTEx v10</span>
         <span><b>Pangenome graphs</b> · variant identification</span>
@@ -269,6 +288,42 @@
         <span><b>Reproducible workflows</b> · containers, Nextflow</span>
         <span><b>Foundation models</b> for genomics</span>
         <span><b>Regulatory genomics</b></span>
+        <span><b>Data engineering</b> · ETL, containers, HPC</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="block" id="projects">
+    <div class="wrap reveal">
+      <p class="eyebrow"><span class="node" style="background:var(--v-green)"></span>Projects</p>
+      <h2>Current research</h2>
+      <p class="lede">Four collaborations, spanning mucosal immunology, spatial biology, and epidemic dynamics.</p>
+      <div class="projs">
+        <article class="proj">
+          <div class="when">Ongoing · 2026</div>
+          <h3>GutEquity</h3>
+          <p>Ancestry-informed risk stratification for inflammatory bowel disease in African American patients. Peripheral blood mononuclear cells are paired with matched intestinal biopsies, and single-cell and spatial transcriptomics used to map the immune-cell states that the circulating and mucosal compartments share or diverge on — centring an ancestry group historically underrepresented in IBD genomics.</p>
+          <span class="with">With Dr. Sarah Glover · Tulane University School of Medicine and the Tulane School of Public Health &amp; Tropical Medicine</span>
+        </article>
+        <article class="proj">
+          <div class="when">Ongoing · 2026</div>
+          <h3>Spatial transcriptomics in celiac disease</h3>
+          <p>Analysis of a Xenium spatial transcriptomics cohort, using spatial statistical methods to characterise cell-to-cell distances and cellular behaviour across diseased and non-diseased tissue.</p>
+          <span class="with">Tulane University School of Medicine</span>
+        </article>
+        <article class="proj">
+          <div class="when">Ongoing · 2025–2026</div>
+          <h3>Epidemic infection-rate forecasting</h3>
+          <p>Predictive systems for epidemic spread and emergent viral strain modelling, including forecasting infection rates from contact-tracing information.</p>
+          <span class="with">With Dr. Dennis Shasha · New York University</span>
+        </article>
+        <article class="proj">
+          <div class="when">Completed · 2025</div>
+          <h3>WGCNA beta-parameter validation</h3>
+          <p>Evaluating the biological validity of scale-free topology in gene co-expression networks across 27 human tissues, with applications to Alzheimer&rsquo;s disease and autism research.</p>
+          <span class="with">With Dr. Naoki Masuda · University at Buffalo</span>
+        </article>
       </div>
     </div>
   </section>
@@ -312,8 +367,8 @@
             <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Procedia Computer Science</span> 222, 341–352 · <span class="yr">2023</span> · <a href="https://doi.org/10.1016/j.procs.2023.08.173" target="_blank" rel="noopener">doi</a></span>
           </li>
           <li>
-            <span class="pub-t">Recent trends and tools in pangenome graph analysis: a comprehensive review</span>
-            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Pathogens</span> (MDPI) <span class="badge">in press</span></span>
+            <span class="pub-t">Pangenome graphs: concepts, tools, and emerging trends in genomic analysis</span>
+            <span class="pub-meta">Ismail, F. N., Amarasoma, S., &amp; Sengupta, A. — <span class="venue">Journal of Genome Biotechnology and Genetics</span> 1(1), 5 · <span class="yr">2026</span> · <a href="https://doi.org/10.3390/jgbg1010005" target="_blank" rel="noopener">doi</a></span>
           </li>
         </ol>
       </div>
@@ -330,6 +385,14 @@
             <span class="pub-meta">Ismail, F. N., Sengupta, A., Woodford, B. J., &amp; Licorish, S. A. — <span class="venue">AusDM, Springer</span>, 239–253 · <span class="yr">2023</span> · <a href="https://doi.org/10.1007/978-981-99-8696-5_17" target="_blank" rel="noopener">doi</a></span>
           </li>
           <li>
+            <span class="pub-t">Revolutionizing bacterial genomics: graph-based strategies for improved variant identification</span>
+            <span class="pub-meta">Ismail, F. N., &amp; Sengupta, A. — <span class="venue">Lecture Notes in Networks and Systems, Springer</span>, 107–122 · <span class="yr">2026</span> · <a href="https://doi.org/10.1007/978-3-032-18985-1_9" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
+            <span class="pub-t">Big data architecture for large organizations</span>
+            <span class="pub-meta">Ismail, F. N., Sengupta, A., &amp; Amarasoma, S. — <span class="venue">10th Intl. Conf. on Big Data Analytics (ICBDA), IEEE</span>, 27–32 · <span class="yr">2025</span> · <a href="https://doi.org/10.1109/ICBDA65366.2025.11211062" target="_blank" rel="noopener">doi</a></span>
+          </li>
+          <li>
             <span class="pub-t">Evaluating the boundaries of big data environments for machine learning</span>
             <span class="pub-meta">Ismail, F. N., Woodford, B. J., &amp; Licorish, S. A. — <span class="venue">AI 2019: Advances in Artificial Intelligence, Springer</span>, 253–264 · <span class="yr">2019</span> · <a href="https://doi.org/10.1007/978-3-030-35288-2_21" target="_blank" rel="noopener">doi</a></span>
           </li>
@@ -340,16 +403,16 @@
         <h3>Under Review / In Preparation</h3>
         <ol class="pubs">
           <li>
+            <span class="pub-t">Truecell reproduces R Seurat&rsquo;s single-cell analysis outputs natively in the Python ecosystem</span>
+            <span class="pub-meta">Ismail, F. N., Amarasoma, S., Galeas-Pena, M., &amp; Glover, S. C. — <span class="venue">Frontiers in Bioinformatics</span> <span class="badge rev">under review</span></span>
+          </li>
+          <li>
             <span class="pub-t">Generative AI for bioinformatics: foundations, applications, tools, and future directions</span>
-            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Briefings in Bioinformatics</span> <span class="badge rev">under review</span></span>
+            <span class="pub-meta">Ismail, F. N., &amp; Amarasoma, S. — <span class="venue">Frontiers in Systems Biology</span> <span class="badge rev">in revision</span></span>
           </li>
           <li>
-            <span class="pub-t">Revolutionising bacterial genomics: graph-based strategies for improved variant identification</span>
-            <span class="pub-meta">Ismail, F. N., &amp; Sengupta, A. — <span class="venue">12th Intl. Symp. on Applied Computing for Software and Smart Systems</span> · <a href="https://arxiv.org/abs/2505.07919" target="_blank" rel="noopener">arXiv:2505.07919</a></span>
-          </li>
-          <li>
-            <span class="pub-t">Big data blueprint architecture for large organisations</span>
-            <span class="pub-meta">Ismail, F. N., Sengupta, A., &amp; Amarasoma, S. — <span class="venue">24th Industrial Conf. on Data Mining</span> · <a href="https://arxiv.org/abs/2505.04717" target="_blank" rel="noopener">arXiv:2505.04717</a></span>
+            <span class="pub-t">Forecasting infection rates in epidemics given contact-tracing information</span>
+            <span class="pub-meta">Wang, R., Sridhar, S., Kascelan, J., Ismail, F. N., &amp; Shasha, D. <span class="badge rev">in preparation</span></span>
           </li>
           <li>
             <span class="pub-t">The power of one-class classification models in wildfire risk prediction</span>
@@ -397,37 +460,78 @@
     </div>
   </section>
 
-  <!-- TEACHING + AWARDS -->
+  <!-- TEACHING + SERVICE -->
   <section class="block" id="teaching">
     <div class="wrap reveal">
       <div class="cols2">
         <div>
           <p class="eyebrow"><span class="node" style="background:var(--v-deep)"></span>Teaching</p>
           <h2>Teaching &amp; mentorship</h2>
-          <p class="lede" style="font-size:1rem">Certified <b>Carpentries Instructor</b> (2023–present) across Data, Library &amp; Software Carpentry — evidence-based instruction in data analysis, programming, and reproducible research. Founder and past president of the Auston Robotics Club, mentoring teams to the World Robot Olympiad.</p>
+          <p class="lede" style="font-size:1rem">Certified <b>Carpentries Instructor</b> (2023–present) across Data, Library &amp; Software Carpentry — evidence-based instruction in data analysis, programming, and reproducible research. Previously Lecturer in Robotics at the Auston Institute of Management Ceylon, Colombo (2015–2016), where I founded and presided over the Auston Robotics Club and mentored teams to the World Robot Olympiad.</p>
           <p class="eyebrow" style="margin-top:2rem"><span class="node" style="background:var(--v-teal)"></span>Education</p>
           <ul class="list-clean">
             <li><span>PhD, Information Science — University of Otago</span><span class="yr">2022</span></li>
-            <li><span>BEng (Hons), Software Engineering — Staffordshire University</span><span class="yr">2015</span></li>
+            <li><span>BEng (Hons), Software Engineering — Staffordshire University · GPA 4.0/4.0</span><span class="yr">2015</span></li>
             <li><span>BSc, Applied Science — University of Sri Jayewardenepura</span><span class="yr">2015</span></li>
           </ul>
         </div>
         <div>
+          <p class="eyebrow"><span class="node" style="background:var(--v-yellow)"></span>Talks</p>
+          <h2>Talks &amp; service</h2>
+          <ul class="list-clean">
+            <li><span>Multilayer co-expression networks: mathematical insights into gene expression variability — <i>NITMB MathBio Convergence, Chicago</i> (podium)</span><span class="yr">2025</span></li>
+            <li><span>Multi-layer co-expression networks — <i>NERCCS 8, Northeast Regional Conference on Complex Systems</i> (poster)</span><span class="yr">2025</span></li>
+            <li><span>A real-time sign-language learning tool for Sri Lanka — <i>Grace Hopper Celebration India</i></span><span class="yr">2016</span></li>
+          </ul>
+          <p class="eyebrow" style="margin-top:2rem"><span class="node" style="background:var(--v-teal)"></span>Editorial &amp; service</p>
+          <ul class="list-clean">
+            <li><span>Guest Editor — <i>Discover Public Health</i>, Springer Nature</span><span class="yr">2026</span></li>
+            <li><span>Organiser, Pan Genome Workshop — University of Otago</span><span class="yr">2023</span></li>
+          </ul>
+          <p class="eyebrow" style="margin-top:2rem"><span class="node" style="background:var(--v-deep)"></span>Memberships</p>
+          <div class="areas">
+            <span>IEEE</span>
+            <span>American Society of Human Genetics</span>
+            <span>MIDAS Network</span>
+            <span>Intl. Association of Engineers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOGNITION + TOOLKIT -->
+  <section class="block" id="recognition">
+    <div class="wrap reveal">
+      <div class="cols2">
+        <div>
           <p class="eyebrow"><span class="node" style="background:var(--v-green)"></span>Recognition</p>
-          <h2>Awards &amp; grants</h2>
+          <h2>Awards &amp; honours</h2>
           <ul class="list-clean">
             <li><span>UUP Individual Development Award</span><span class="yr">2025</span></li>
             <li><span>NITMB Convergence Conference Travel Award</span><span class="yr">2025</span></li>
-            <li><span>ACM Richard Tapia Diversity in Computing Award</span><span class="yr">2017</span></li>
+            <li><span>ACM Richard Tapia Celebration of Diversity in Computing Scholar</span><span class="yr">2017</span></li>
             <li><span>University of Otago Doctoral Scholarship</span><span class="yr">2017</span></li>
+            <li><span>Grace Hopper Scholar, Google</span><span class="yr">2016</span></li>
+            <li><span>NYUAD Hackathon for Social Good — first Sri Lankan selected</span><span class="yr">2016</span></li>
+            <li><span>CERN Port Humanitarian Hackathon Scholar, Geneva</span><span class="yr">2016</span></li>
+            <li><span>Best Innovator Award, MillenniumIT</span><span class="yr">2015</span></li>
+            <li><span>Academic Colors Award, APIIT / Staffordshire University</span><span class="yr">2015</span></li>
             <li><span>Google Anita Borg Memorial Scholarship</span><span class="yr">2014</span></li>
-            <li><span>CERN Port Humanitarian Hackathon Scholar</span><span class="yr">2016</span></li>
           </ul>
-          <p class="eyebrow" style="margin-top:2rem"><span class="node" style="background:var(--v-deep)"></span>Toolkit</p>
+        </div>
+        <div>
+          <p class="eyebrow"><span class="node" style="background:var(--v-teal)"></span>Toolkit</p>
+          <h2>Certifications &amp; skills</h2>
+          <ul class="list-clean">
+            <li><span>Medical Neuroscience — Duke University / Coursera</span><span class="yr">2025</span></li>
+            <li><span>Certified Carpentries Instructor — Data, Library, Software Carpentry</span><span class="yr">2023</span></li>
+          </ul>
           <dl class="skills">
             <dt>Languages</dt><dd>Python, R, Unix, SQL, Java, C/C++</dd>
-            <dt>Bioinformatics</dt><dd>Genome &amp; pangenome graphs, WGCNA, GTEx workflows, variant calling, Seurat, Scanpy</dd>
-            <dt>ML / Data</dt><dd>Deep learning, XAI, ensembles, Docker, Singularity, Nextflow, HPC</dd>
+            <dt>Bioinformatics</dt><dd>Genome &amp; pangenome graphs, structural variant detection, WGCNA, GTEx workflows, read alignment, variant calling, single-cell &amp; spatial transcriptomics (Seurat, Scanpy)</dd>
+            <dt>Machine learning</dt><dd>Deep learning, one-class classification, ensemble methods, explainable AI, foundation models for genomics</dd>
+            <dt>Data engineering</dt><dd>ETL pipelines, cloud environments, Docker, Singularity, Nextflow, HPC clusters</dd>
           </dl>
         </div>
       </div>
