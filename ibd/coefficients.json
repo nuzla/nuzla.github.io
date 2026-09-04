@@ -1,0 +1,135 @@
+{
+  "schema": "geri-coefficients/1.0",
+  "version": "0.1.0-provisional",
+  "status": "PROVISIONAL — priors derived from published effect sizes. NOT fitted to the GutEquity cohort. Replace at milestone M2.",
+  "generated": "2026-09-03",
+  "provenance": {
+    "dsi_weights": "Siegel CA et al. Gut 2018;67:244-254, as tabulated in Swaminathan A et al. Inflamm Bowel Dis 2024;30:2064-2075 Fig 1.",
+    "beta_severity": "Swaminathan 2024: baseline DSI aOR 1.05 per point (95% CI 1.02-1.09) for complicated course at 24 months. ln(1.05)*10 = 0.4879 per 10 points.",
+    "baseline_risk": "Swaminathan 2022 APT: 49/172 = 28.5% complicated course at 12 months. Swaminathan 2024: 71/171 = 41.5% at 24 months.",
+    "serology": "Bertha M et al. Inflamm Bowel Dis 2018;24:209-216 (n=358 African American CD). Complicated disease: IgG ASCA OR 2.67 (1.67-4.28), anti-OmpC OR 2.23 (1.41-3.53). Surgery: 2.51 (1.49-4.22), 3.57 (2.12-6.00). No interaction with European admixture was observed, so serology enters UNCONDITIONED on ancestry.",
+    "prs": "Somineni HK et al. Am J Hum Genet 2021;108:431-445 — ancestry-appropriate weights improve prediction in the highest risk percentiles. Deliberately conservative per-SD prior; the evidence supports top-percentile enrichment, not a large per-SD effect."
+  },
+
+  "dsi": {
+    "CD": {
+      "mucosal_lesions":   {"none": 0, "small": 6, "large": 16},
+      "fistula":           {"absent": 0, "present": 11},
+      "perianal_abscess":  {"absent": 0, "present": 10},
+      "resection":         {"none": 0, "one_lt40": 2, "one_ge40": 7},
+      "stoma":             {"absent": 0, "present": 7},
+      "extent":            {"limited": 0, "extensive": 6},
+      "stool_freq":        {"lt10_wk": 0, "ge10_wk": 6},
+      "stricture":         {"absent": 0, "present": 5},
+      "crp":               {"normal": 0, "slight": 2, "elevated": 5},
+      "biologic_use":      {"never": 0, "used_improved": 2, "used_not_improved": 5},
+      "daily_activity":    {"not_significant": 0, "significant": 5},
+      "albumin":           {"normal": 0, "low": 4},
+      "anorectal_symptoms":{"none": 0, "present": 4},
+      "anaemia":           {"no": 0, "yes": 4},
+      "abdominal_pain":    {"infrequent": 0, "daily": 3},
+      "steroid_12mo":      {"no": 0, "yes": 2}
+    },
+    "UC": {
+      "mucosal_lesions":   {"none": 0, "erosions": 14, "ulcers": 18},
+      "daily_activity":    {"not_significant": 0, "significant": 14},
+      "crp":               {"normal": 0, "slight": 4, "elevated": 11},
+      "biologic_use":      {"never": 0, "used_improved": 4, "used_not_improved": 10},
+      "hospitalisation_12mo": {"no": 0, "yes": 8},
+      "steroid_12mo":      {"no": 0, "yes": 8},
+      "anaemia":           {"no": 0, "yes": 5},
+      "stool_freq":        {"no_change": 0, "plus1": 4, "plus2_or_more": 5},
+      "albumin":           {"normal": 0, "low": 5},
+      "extent":            {"distal": 0, "extensive": 5},
+      "nocturnal_bm":      {"absent": 0, "present": 4},
+      "anorectal_symptoms":{"none": 0, "present": 4},
+      "rectal_bleeding":   {"absent": 0, "present": 3}
+    }
+  },
+
+  "care_pathway_items": {
+    "CD": ["biologic_use", "steroid_12mo"],
+    "UC": ["biologic_use", "steroid_12mo", "hospitalisation_12mo"]
+  },
+
+  "continuous_labs": {
+    "crp":     {"midpoint_mgL": 5.0, "slope_log": 0.70, "comment": "Smooth logistic replacement for the 3/5 mg/L steps. Re-estimate stratum-specific cut-points at M2."},
+    "albumin": {"upper_gdl": 3.5, "span_gdl": 0.80},
+    "anaemia": {"hb_ref_male_gdl": 13.0, "hb_ref_female_gdl": 12.0, "span_gdl": 2.0, "comment": "WHO thresholds. Haemoglobinopathy status to be entered as a covariate at M2 (ibd.docx section 7)."}
+  },
+
+  "aci": {
+    "care_propensity": {"gamma0": -2.20, "gamma_severity": 5.00, "gamma_alert": 0.90,
+      "comment": "P(a patient with this biology is on advanced therapy). gamma_severity applies to GERI-B/100. Provisional; fit to the cohort at M2 as a logistic model of ever-advanced-therapy on GERI-B and the phenotype alert."},
+    "structural_barriers": {
+      "uninsured": 0.25, "medicaid": 0.15, "insurance_gap_12mo": 0.20,
+      "distance_gt_80km": 0.15, "ambulatory_visits_lt2": 0.15,
+      "endoscopy_ordered_not_done": 0.25, "adi_ge_80": 0.15,
+      "steroid_without_biologic": 0.25, "hospitalised_without_biologic": 0.20
+    },
+    "weight_care_deficit": 0.60,
+    "weight_structural": 0.40,
+    "high_threshold": 40
+  },
+
+  "constitutional": {
+    "beta_prs_per_sd": 0.25,
+    "prs_z_clamp": 3.0,
+    "serology_logOR": {
+      "primary_composite": {"asca_igg": 0.982, "ompc": 0.802, "anca": 0.0},
+      "surgery_sensitivity": {"asca_igg": 0.920, "ompc": 1.273, "anca": 0.0}
+    },
+    "serology_applies_to": ["CD"],
+    "ancestry_conditioned": false
+  },
+
+  "risk": {
+    "beta0_12mo": -2.0425,
+    "beta0_24mo": -1.4659,
+    "beta_severity_per10": 0.4879,
+    "beta_constitutional": 0.50,
+    "beta_alert": 0.30,
+    "shrinkage_rationale": "Both terms are SHRUNK from their published effect sizes because the published estimates are largely unadjusted for concurrent severity, and GERI-B already carries that severity. Bertha's serology odds ratios (2.67 and 2.23) contrast complicated with uncomplicated disease; a patient scoring 65 on GERI-B is already most of the way to 'complicated', so adding the full log-odds counts the same signal twice. The phenotype alert double-counts more directly still: a fistula contributes 11 points to GERI-B and also fires the alert. A shrinkage of 0.5 and 0.3 is a placeholder, not an estimate. The correct values come from milestone M2's incremental-value test — fitting the composite with and without the constitutional layer is the same comparison that decides the M2 go/no-go, so this coefficient and that milestone are answered by one analysis.",
+    "access_offset_reference": 0.0,
+    "high_threshold_12mo": 0.25,
+    "risk_bands": [[0.10, "Low"], [0.25, "Moderate"], [0.50, "High"], [1.01, "Very high"]],
+    "band_rationale": "The BAND is the deliverable; the point estimate is provisional and is not calibrated in the tails. Displaying 97.7% asserts a precision these coefficients cannot support. Report the band, show the point estimate beside it, and say which it is. Revisit once M2 supplies a calibration slope.",
+    "derivation": "beta_severity_per10 = ln(1.05)*10 = 0.4879, from Swaminathan 2024's baseline DSI aOR of 1.05 per point (95% CI 1.02-1.09) for a complicated course. beta0_12mo places the cohort median DSI of 23 (IQR 12-39, Swaminathan 2024 Table 1) at the observed 12-month event rate of 28.5% (Swaminathan 2022): logit(0.285) - 0.4879*2.3 = -2.0425. The 24-month intercept is shifted by ln of the marginal odds ratio between the 41.5% and 28.5% event rates, ln(1.780) = 0.5766.",
+    "known_deficiency": "This prior is deliberately conservative and UNDER-SEPARATES the tails. It puts a DSI of 12 at 18.9% risk where the reported sensitivity of 84% and specificity of 72% at threshold 23 imply about 8.1% below threshold and 54.5% above. A steeper slope fitted to those two group means (0.11853 per point) was tested and rejected: it drives a DSI of 65 to a 12-month risk above 99%, which no reported group approaches. The published aOR is an ADJUSTED residual per-point effect and so understates the marginal association, but it is the only per-point estimate that exists, and over-fitting a slope to two interpolated group means is the worse error. Refit on the cohort at M2 and report the calibration slope; correcting this under-separation is a named M2 deliverable, not an accepted property.",
+    "comment": "beta_constitutional multiplies the summed log-odds from PRS and serology. access_offset_reference is the counterfactual guideline-concordant-access level substituted at deployment for the patient's observed access covariates."
+  },
+
+  "mci": {
+    "field_weights": {
+      "crp_mgL": 3, "albumin_gdl": 3, "hb_gdl": 3, "stool_freq": 2,
+      "daily_activity": 2, "anorectal_symptoms": 1, "extent": 2,
+      "biologic_use": 3, "steroid_12mo": 2, "hospitalisation_12mo": 2,
+      "mucosal_lesions": 4, "asca_igg": 2, "ompc": 2, "prs_percentile": 3,
+      "insurance": 1, "ambulatory_visits_12mo": 1, "distance_km": 1, "adi_national_pct": 1
+    },
+    "tier_requirements": {
+      "0": ["crp_mgL", "albumin_gdl", "hb_gdl", "biologic_use", "steroid_12mo"],
+      "1": ["mucosal_lesions"],
+      "2": ["asca_igg", "ompc"],
+      "3": ["prs_percentile", "pi_afr"]
+    }
+  },
+
+  "benchmarks": {
+    "comment": "The bar GERI must clear. All verified against the source PDFs, not against secondary transcription.",
+    "dsi_auroc_24mo": {"all_ibd": [0.82, 0.76, 0.89], "cd": [0.81, 0.72, 0.90], "uc": [0.88, 0.80, 0.96]},
+    "dsi_auroc_12mo": {"all_ibd": 0.84, "cd": 0.83, "uc": 0.90},
+    "dsi_threshold": {"all_ibd": 23, "cd_2024": 23, "cd_2022": 22, "uc": 29},
+    "dsi_sens_spec_at_23": {"all_ibd": [0.86, 0.71], "cd": [0.84, 0.76], "uc": [0.89, 0.65]},
+    "dsi_sens_spec_uc_at_29": [0.85, 0.78],
+    "dsi_icc": {"cd": 0.93, "uc": 0.97},
+    "dsi_cronbach_alpha": {"cd": 0.64, "uc": 0.79},
+    "dsi_weighted_kappa_weakest": {"anorectal_symptoms_cd": 0.32, "daily_activity_cd": 0.45},
+    "incremental_auroc_all_ibd": {"without_dsi": 0.76, "with_dsi": 0.84, "p": "<0.01"},
+    "event_rate": {"12mo": 0.285, "24mo": 0.415},
+    "median_weeks_to_first_complication": 23,
+    "median_dsi_iqr": {"all_ibd": [23, 12, 39], "cd": [21, 10, 31], "uc": [31, 14, 60]},
+    "median_dsi_by_endoscopic_activity": {"active": [28, 19, 41], "inactive": [12, 5, 21], "note": "Swaminathan 2022 — endoscopic activity, NOT complicated course. Do not relabel."},
+    "validation_cohort_european_pct": {"swaminathan_2024": 95.7, "swaminathan_2022": 98.3}
+  }
+}

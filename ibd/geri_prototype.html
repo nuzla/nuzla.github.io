@@ -1,0 +1,965 @@
+<title>GutEquity Risk Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  /* neutrals carry a green-grey bias toward the accent, so they read chosen */
+  --ground:#F6F7F6; --surface:#FFFFFF; --surface-2:#F0F2F1; --sunken:#E7EBEA;
+  --ink:#161A19; --ink-2:#4B5451; --ink-3:#79817E; --rule:#DEE3E1; --rule-2:#C6CDCA;
+  --band:#16302E; --band-ink:#EAF2F0; --band-ink-2:#93B3AE; --band-rule:#2A4A47;
+  --accent:#1F5F5B; --accent-ink:#FFFFFF; --accent-soft:#E3EDEB;
+  --sev-1:#4C7A5A; --sev-2:#B8873A; --sev-3:#B5533C; --sev-4:#8C2F2A;
+  --flag:#6A4C93; --flag-soft:#EFE9F6;
+  --care:#9A6B2F; --care-soft:#F7EFE2;
+  /* verdict fields — each quadrant is a different kind of state, not just a shade */
+  --v-routine:#EDF3EE; --v-routine-ink:#33613F;
+  --v-escalate:#FBEEEA; --v-escalate-ink:#9C452F;
+  --v-nav:#F7E7E4;     --v-nav-ink:#7C2823;
+  --v-flag:#EFE9F6;    --v-flag-ink:#5A3E80;
+  --v-none:#EFF1F0;    --v-none-ink:#5A6360;
+  --lift:0 1px 1px rgba(20,32,30,.04), 0 6px 20px -6px rgba(20,32,30,.10);
+  --lift-2:0 1px 2px rgba(20,32,30,.05), 0 14px 34px -12px rgba(20,32,30,.16);
+  --f-disp:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-ui:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#101413; --surface:#181D1C; --surface-2:#1F2524; --sunken:#0C100F;
+  --ink:#E7ECEA; --ink-2:#A7B1AE; --ink-3:#79847F; --rule:#2A3231; --rule-2:#3A4341;
+  --band:#0C1817; --band-ink:#DCE9E7; --band-ink-2:#7FA5A0; --band-rule:#22403D;
+  --accent:#6FB3AC; --accent-ink:#08100F; --accent-soft:#1A2E2C;
+  --sev-1:#7BAE8B; --sev-2:#D6A85E; --sev-3:#DE7F68; --sev-4:#C4665E;
+  --flag:#A88BD0; --flag-soft:#241E31;
+  --care:#C79A5C; --care-soft:#261F14;
+  --v-routine:#16241A; --v-routine-ink:#8CC49C;
+  --v-escalate:#2A1815; --v-escalate-ink:#E29079;
+  --v-nav:#2E1513;     --v-nav-ink:#DE8378;
+  --v-flag:#211A2D;    --v-flag-ink:#B79BDD;
+  --v-none:#1B211F;    --v-none-ink:#95A09C;
+  --lift:0 1px 1px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+  --lift-2:0 1px 2px rgba(0,0,0,.35), 0 14px 34px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --ground:#101413; --surface:#181D1C; --surface-2:#1F2524; --sunken:#0C100F;
+  --ink:#E7ECEA; --ink-2:#A7B1AE; --ink-3:#79847F; --rule:#2A3231; --rule-2:#3A4341;
+  --band:#0C1817; --band-ink:#DCE9E7; --band-ink-2:#7FA5A0; --band-rule:#22403D;
+  --accent:#6FB3AC; --accent-ink:#08100F; --accent-soft:#1A2E2C;
+  --sev-1:#7BAE8B; --sev-2:#D6A85E; --sev-3:#DE7F68; --sev-4:#C4665E;
+  --flag:#A88BD0; --flag-soft:#241E31;
+  --care:#C79A5C; --care-soft:#261F14;
+  --v-routine:#16241A; --v-routine-ink:#8CC49C;
+  --v-escalate:#2A1815; --v-escalate-ink:#E29079;
+  --v-nav:#2E1513;     --v-nav-ink:#DE8378;
+  --v-flag:#211A2D;    --v-flag-ink:#B79BDD;
+  --v-none:#1B211F;    --v-none-ink:#95A09C;
+  --lift:0 1px 1px rgba(0,0,0,.3), 0 6px 20px -6px rgba(0,0,0,.5);
+  --lift-2:0 1px 2px rgba(0,0,0,.35), 0 14px 34px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-ui);
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-disp);font-weight:600;text-wrap:balance;margin:0}
+.wrap{max-width:1400px;margin:0 auto;padding:0 26px 80px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-feature-settings:"zero"1}
+
+/* ================= header band ================= */
+.band{background:var(--band);color:var(--band-ink)}
+.band-in{max-width:1400px;margin:0 auto;padding:22px 26px 20px;
+  display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap;justify-content:space-between}
+.band h1{font-size:29px;line-height:1.1;letter-spacing:-.018em;color:var(--band-ink)}
+.band .sub{color:var(--band-ink-2);font-size:13.5px;max-width:62ch;margin-top:6px}
+.warnchip{display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+  border:1px solid #6E3A34;background:#2A1614;color:#F0BBB2;
+  border-radius:999px;padding:4px 12px 4px 9px;font-size:11.5px;line-height:1.45}
+.warnchip b{font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-size:10px;
+  background:#8C2F2A;color:#fff;border-radius:999px;padding:2px 7px}
+.hdr-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-bottom:2px}
+
+/* ================= controls ================= */
+button,select,input{font:inherit;color:inherit}
+.btn{background:transparent;border:1px solid var(--band-rule);color:var(--band-ink);
+  border-radius:7px;padding:6px 13px;cursor:pointer;font-size:13px;font-weight:500;
+  transition:background .13s,border-color .13s}
+.btn:hover{background:#1E3D3A;border-color:#3A605C}
+.btn.primary{background:var(--band-ink);color:var(--band);border-color:var(--band-ink);font-weight:600}
+.btn.primary:hover{background:#fff;border-color:#fff}
+.band select{background:transparent;border:1px solid var(--band-rule);color:var(--band-ink);
+  border-radius:7px;padding:6px 10px;font-size:13px;max-width:270px}
+.band select option{background:var(--surface);color:var(--ink)}
+:is(button,select,input,a,summary):focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.seg{display:inline-flex;border:1px solid var(--band-rule);border-radius:7px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:6px 14px;cursor:pointer;
+  font-size:13px;font-weight:600;color:var(--band-ink-2)}
+.seg button+button{border-left:1px solid var(--band-rule)}
+.seg button[aria-pressed="true"]{background:var(--band-ink);color:var(--band)}
+
+/* ================= layout ================= */
+.cols{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:26px;margin-top:26px;align-items:start}
+@media (max-width:1100px){.cols{grid-template-columns:1fr}}
+.results{position:sticky;top:16px;background:var(--surface);border:1px solid var(--rule);
+  border-radius:12px;box-shadow:var(--lift-2);overflow:hidden}
+@media (max-width:1100px){.results{position:static}}
+.formcol{background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+  box-shadow:var(--lift);overflow:hidden}
+
+/* ================= form ================= */
+.layer{border-bottom:1px solid var(--rule)}
+.layer:last-child{border-bottom:0}
+.layer>summary{padding:13px 18px;cursor:pointer;list-style:none;display:flex;
+  gap:11px;align-items:center;font-weight:600;font-size:13.5px}
+.layer>summary::-webkit-details-marker{display:none}
+.lcode{font-family:var(--f-num);font-size:10.5px;font-weight:600;letter-spacing:.04em;
+  background:var(--sunken);color:var(--ink-3);border-radius:5px;padding:2px 6px}
+.layer.care>summary .lcode{background:var(--care-soft);color:var(--care)}
+.layer>summary .lnote{margin-left:auto;font-weight:400;font-size:11.5px;color:var(--ink-3);
+  text-align:right}
+.layer>summary::after{content:"";width:7px;height:7px;flex:none;margin-left:10px;
+  border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);
+  transform:rotate(-45deg) translate(-1px,1px);transition:transform .16s}
+.layer[open]>summary::after{transform:rotate(45deg) translate(-2px,-2px)}
+.fields{padding:0 18px 18px;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:13px 15px}
+.f label{font-size:11px;font-weight:600;color:var(--ink-2);letter-spacing:.025em;
+  margin-bottom:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.f select,.f input{width:100%;padding:6px 9px;border:1px solid var(--rule-2);
+  border-radius:6px;background:var(--surface);font-size:13px;
+  transition:border-color .13s,box-shadow .13s}
+.f select:hover,.f input:hover{border-color:var(--ink-3)}
+.f input[type=number]{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.f.care select,.f.care input{border-color:var(--care);background:var(--care-soft);color:var(--ink)}
+.f.care label{color:var(--care)}
+.chk{display:flex;gap:9px;align-items:center;margin-top:17px;cursor:pointer;
+  border:1px solid var(--rule-2);border-radius:6px;padding:7px 10px;
+  transition:border-color .13s,background .13s}
+.chk:hover{border-color:var(--ink-3)}
+.f.care .chk{border-color:var(--care);background:var(--care-soft)}
+.chk input{width:15px;height:15px;flex:none;accent-color:var(--accent);margin:0}
+.f.care .chk input{accent-color:var(--care)}
+.chk span{font-size:12px;font-weight:500;line-height:1.35}
+.pill{font-family:var(--f-num);font-size:9px;font-weight:600;letter-spacing:.04em;
+  padding:2px 5px;border-radius:4px;background:var(--sunken);color:var(--ink-3);
+  text-transform:uppercase}
+.pill.t2{background:var(--accent-soft);color:var(--accent)}
+.pill.t3{background:var(--flag-soft);color:var(--flag)}
+.pill.unit{background:transparent;border:1px solid var(--rule-2);color:var(--ink-3);text-transform:none}
+
+/* ================= verdict field ================= */
+.verdict{padding:20px 22px 19px;background:var(--v-none);color:var(--v-none-ink)}
+.verdict[data-q="routine"]{background:var(--v-routine);color:var(--v-routine-ink)}
+.verdict[data-q="escalate"]{background:var(--v-escalate);color:var(--v-escalate-ink)}
+.verdict[data-q="escalate_and_navigate"]{background:var(--v-nav);color:var(--v-nav-ink)}
+.verdict[data-q="equity_flag"]{background:var(--v-flag);color:var(--v-flag-ink)}
+.vtop{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.vlabel{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;opacity:.72}
+.vtier{margin-left:auto;font-family:var(--f-num);font-size:10.5px;opacity:.75}
+.vname{font-family:var(--f-disp);font-size:27px;font-weight:600;line-height:1.15;
+  margin:5px 0 7px;letter-spacing:-.01em}
+.verdict p{margin:0;font-size:13.5px;line-height:1.55;max-width:64ch;color:var(--ink-2)}
+.verdict[data-q="equity_flag"] p{color:var(--v-flag-ink)}
+
+/* ================= readouts ================= */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid var(--rule);border-top:1px solid var(--rule);background:var(--rule)}
+@media (max-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{padding:14px 16px 13px;background:var(--surface);position:relative}
+.tl{font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+.tv{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:27px;font-weight:600;
+  line-height:1.1;margin-top:5px;letter-spacing:-.02em}
+.tv small{font-size:14px;font-weight:400;color:var(--ink-3);letter-spacing:0}
+.tn{font-size:10.5px;color:var(--ink-3);margin-top:4px;line-height:1.35}
+.spark{margin-top:7px;height:3px;border-radius:2px;background:var(--sunken);overflow:hidden}
+.spark i{display:block;height:100%;border-radius:2px;transition:width .4s cubic-bezier(.2,.8,.3,1)}
+@keyframes moved{0%{background:var(--accent-soft)}100%{background:var(--surface)}}
+.tile.moved{animation:moved .9s ease-out}
+
+/* ================= sections ================= */
+.sec{padding:18px 22px;border-bottom:1px solid var(--rule)}
+.sec:last-child{border-bottom:0}
+.sech{font-size:10px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);font-family:var(--f-ui);margin-bottom:12px;display:flex;
+  align-items:baseline;gap:10px}
+.sech em{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none;
+  font-size:11px;color:var(--ink-3);margin-left:auto}
+.muted{color:var(--ink-3);font-size:12.5px;margin:0;line-height:1.6}
+
+/* flags */
+.flags{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.flags li{font-size:12.5px;padding:7px 11px 7px 30px;position:relative;border-radius:7px;
+  background:var(--surface-2);color:var(--ink);line-height:1.4}
+.flags li::before{content:"";position:absolute;left:12px;top:12px;width:0;height:0;
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-bottom:8px solid var(--sev-3)}
+.flags.barrier li{background:var(--care-soft)}
+.flags.barrier li::before{border:0;width:7px;height:7px;border-radius:2px;
+  background:var(--care);top:13px;left:12px}
+
+/* waterfall */
+.wf{display:flex;flex-direction:column;gap:4px}
+.wfr{display:grid;grid-template-columns:138px 1fr 66px;gap:11px;align-items:center;font-size:11.5px}
+.wfr .n{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wftrack{height:15px;background:var(--sunken);border-radius:3px;overflow:hidden;position:relative}
+.wftrack i{display:block;height:100%;background:var(--accent);border-radius:3px;
+  transition:width .35s cubic-bezier(.2,.8,.3,1)}
+.wfr .v{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:10.5px;
+  text-align:right;color:var(--ink-2)}
+.wfr.care .n{color:var(--care);text-decoration:line-through;
+  text-decoration-thickness:1px;text-decoration-color:var(--care)}
+.wfr.care .wftrack{background:var(--care-soft);
+  background-image:repeating-linear-gradient(135deg,transparent,transparent 5px,
+    color-mix(in srgb,var(--care) 22%,transparent) 5px,
+    color-mix(in srgb,var(--care) 22%,transparent) 10px)}
+.wfr.care .v{color:var(--care)}
+.wfr.miss .wftrack{background:transparent;border:1px dashed var(--rule-2)}
+.wfr.miss .n,.wfr.miss .v{color:var(--ink-3);font-style:italic}
+.wfnote{margin-top:12px;padding:10px 13px;border-radius:8px;background:var(--care-soft);
+  color:var(--care);font-size:11.5px;line-height:1.5}
+.wfnote b{font-weight:700}
+
+/* working table */
+table.kv{width:100%;border-collapse:collapse;font-size:12.5px}
+table.kv td{padding:7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+table.kv tr:last-child td{border-bottom:0}
+table.kv td:last-child{text-align:right;font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:14px}
+table.kv td.wrap-r{font-family:var(--f-ui);white-space:normal;color:var(--ink-3);font-size:11.5px}
+
+footer{margin-top:36px;padding-top:22px;border-top:1px solid var(--rule);
+  color:var(--ink-3);font-size:12.5px;max-width:92ch;line-height:1.65}
+footer h3{font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  font-family:var(--f-ui);font-weight:700;color:var(--ink-2);margin-bottom:8px}
+footer p{margin:0 0 11px}
+footer strong{color:var(--ink-2)}
+footer code{font-family:var(--f-num);font-size:11.5px;background:var(--sunken);
+  padding:1px 5px;border-radius:4px}
+
+@media print{
+  .band{background:#fff;color:#000;border-bottom:2px solid #000}
+  .band h1{color:#000}.band .sub,.warnchip{color:#000}
+  .warnchip{border:1px solid #000;background:#fff}
+  .noprint,.formcol,footer{display:none!important}
+  .cols{grid-template-columns:1fr;margin-top:12px}
+  .results{box-shadow:none;border:1px solid #999;position:static}
+  body{font-size:10.5px;background:#fff}
+  .sec{padding:11px 14px;break-inside:avoid}
+  .vname{font-size:20px}.tv{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<div class="band">
+  <div class="band-in">
+    <div>
+      <h1>GutEquity Risk Index</h1>
+      <p class="sub">Ancestry-informed risk stratification for inflammatory bowel disease, built so that care not received cannot be mistaken for disease not present.</p>
+      <span class="warnchip"><b>Prototype</b> Provisional coefficients, not fitted to the cohort. Not for clinical use — do not enter patient-identifiable information.</span>
+    </div>
+    <div class="hdr-actions noprint">
+      <div class="seg" role="group" aria-label="Disease subtype">
+        <button type="button" id="btnCD" aria-pressed="true">Crohn's</button>
+        <button type="button" id="btnUC" aria-pressed="false">Ulcerative colitis</button>
+      </div>
+      <select id="caseSel" aria-label="Load an example case"></select>
+      <button type="button" class="btn" id="btnClear">Clear</button>
+      <button type="button" class="btn" id="btnJSON">Export</button>
+      <button type="button" class="btn primary" id="btnPrint">Print report</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="cols">
+  <div class="formcol noprint" id="form"></div>
+  <div class="results" id="out"></div>
+</div>
+
+<footer>
+  <h3>What this prototype is for</h3>
+  <p>This is the customer-discovery artefact for milestone M3. It exists so a gastroenterologist can be shown a working report and asked one question: <em>would you act on this, and where would it sit in your clinic?</em> Every number on it is provisional.</p>
+  <p><strong>The one idea worth arguing about.</strong> The published Disease Severity Index assigns 26 of its 100 ulcerative-colitis points to items that record <em>care received</em> — advanced therapy, corticosteroids, hospitalisation — rather than disease biology. Where access to that care is unequal, those items carry the care pathway into the severity score. GERI removes them from severity and reports them separately as the Access-Contamination Index, so a reassuring score that rests on treatment never offered becomes visible rather than silent.</p>
+  <p><strong>Try it.</strong> Load the equity-quadrant case, then change <em>Biologic or immunomodulator</em> from “Never used” to “Used, no improvement.” The severity barely moves; the ACI collapses. That difference is the whole argument.</p>
+  <p><strong>Reproducibility.</strong> The scoring here mirrors <code>reference/geri_score.py</code> exactly; <code>uv run reference/geri_score.py --check-parity reference/fixtures.json</code> proves it. Coefficients live in <code>coefficients.json</code> with the published source of every value. The full specification is in <code>GutEquity_Index_Specification.md</code>.</p>
+  <p><strong>Ancestry, not race.</strong> Genetic ancestry proportion enters the biology layers. Self-identified race enters nothing; it is collected only alongside the access variables, where it indexes exposure to unequal care rather than biology.</p>
+</footer>
+</div>
+<script>
+const COEF={
+  "schema": "geri-coefficients/1.0",
+  "version": "0.1.0-provisional",
+  "status": "PROVISIONAL — priors derived from published effect sizes. NOT fitted to the GutEquity cohort. Replace at milestone M2.",
+  "generated": "2026-09-03",
+  "provenance": {
+    "dsi_weights": "Siegel CA et al. Gut 2018;67:244-254, as tabulated in Swaminathan A et al. Inflamm Bowel Dis 2024;30:2064-2075 Fig 1.",
+    "beta_severity": "Swaminathan 2024: baseline DSI aOR 1.05 per point (95% CI 1.02-1.09) for complicated course at 24 months. ln(1.05)*10 = 0.4879 per 10 points.",
+    "baseline_risk": "Swaminathan 2022 APT: 49/172 = 28.5% complicated course at 12 months. Swaminathan 2024: 71/171 = 41.5% at 24 months.",
+    "serology": "Bertha M et al. Inflamm Bowel Dis 2018;24:209-216 (n=358 African American CD). Complicated disease: IgG ASCA OR 2.67 (1.67-4.28), anti-OmpC OR 2.23 (1.41-3.53). Surgery: 2.51 (1.49-4.22), 3.57 (2.12-6.00). No interaction with European admixture was observed, so serology enters UNCONDITIONED on ancestry.",
+    "prs": "Somineni HK et al. Am J Hum Genet 2021;108:431-445 — ancestry-appropriate weights improve prediction in the highest risk percentiles. Deliberately conservative per-SD prior; the evidence supports top-percentile enrichment, not a large per-SD effect."
+  },
+
+  "dsi": {
+    "CD": {
+      "mucosal_lesions":   {"none": 0, "small": 6, "large": 16},
+      "fistula":           {"absent": 0, "present": 11},
+      "perianal_abscess":  {"absent": 0, "present": 10},
+      "resection":         {"none": 0, "one_lt40": 2, "one_ge40": 7},
+      "stoma":             {"absent": 0, "present": 7},
+      "extent":            {"limited": 0, "extensive": 6},
+      "stool_freq":        {"lt10_wk": 0, "ge10_wk": 6},
+      "stricture":         {"absent": 0, "present": 5},
+      "crp":               {"normal": 0, "slight": 2, "elevated": 5},
+      "biologic_use":      {"never": 0, "used_improved": 2, "used_not_improved": 5},
+      "daily_activity":    {"not_significant": 0, "significant": 5},
+      "albumin":           {"normal": 0, "low": 4},
+      "anorectal_symptoms":{"none": 0, "present": 4},
+      "anaemia":           {"no": 0, "yes": 4},
+      "abdominal_pain":    {"infrequent": 0, "daily": 3},
+      "steroid_12mo":      {"no": 0, "yes": 2}
+    },
+    "UC": {
+      "mucosal_lesions":   {"none": 0, "erosions": 14, "ulcers": 18},
+      "daily_activity":    {"not_significant": 0, "significant": 14},
+      "crp":               {"normal": 0, "slight": 4, "elevated": 11},
+      "biologic_use":      {"never": 0, "used_improved": 4, "used_not_improved": 10},
+      "hospitalisation_12mo": {"no": 0, "yes": 8},
+      "steroid_12mo":      {"no": 0, "yes": 8},
+      "anaemia":           {"no": 0, "yes": 5},
+      "stool_freq":        {"no_change": 0, "plus1": 4, "plus2_or_more": 5},
+      "albumin":           {"normal": 0, "low": 5},
+      "extent":            {"distal": 0, "extensive": 5},
+      "nocturnal_bm":      {"absent": 0, "present": 4},
+      "anorectal_symptoms":{"none": 0, "present": 4},
+      "rectal_bleeding":   {"absent": 0, "present": 3}
+    }
+  },
+
+  "care_pathway_items": {
+    "CD": ["biologic_use", "steroid_12mo"],
+    "UC": ["biologic_use", "steroid_12mo", "hospitalisation_12mo"]
+  },
+
+  "continuous_labs": {
+    "crp":     {"midpoint_mgL": 5.0, "slope_log": 0.70, "comment": "Smooth logistic replacement for the 3/5 mg/L steps. Re-estimate stratum-specific cut-points at M2."},
+    "albumin": {"upper_gdl": 3.5, "span_gdl": 0.80},
+    "anaemia": {"hb_ref_male_gdl": 13.0, "hb_ref_female_gdl": 12.0, "span_gdl": 2.0, "comment": "WHO thresholds. Haemoglobinopathy status to be entered as a covariate at M2 (ibd.docx section 7)."}
+  },
+
+  "aci": {
+    "care_propensity": {"gamma0": -2.20, "gamma_severity": 5.00, "gamma_alert": 0.90,
+      "comment": "P(a patient with this biology is on advanced therapy). gamma_severity applies to GERI-B/100. Provisional; fit to the cohort at M2 as a logistic model of ever-advanced-therapy on GERI-B and the phenotype alert."},
+    "structural_barriers": {
+      "uninsured": 0.25, "medicaid": 0.15, "insurance_gap_12mo": 0.20,
+      "distance_gt_80km": 0.15, "ambulatory_visits_lt2": 0.15,
+      "endoscopy_ordered_not_done": 0.25, "adi_ge_80": 0.15,
+      "steroid_without_biologic": 0.25, "hospitalised_without_biologic": 0.20
+    },
+    "weight_care_deficit": 0.60,
+    "weight_structural": 0.40,
+    "high_threshold": 40
+  },
+
+  "constitutional": {
+    "beta_prs_per_sd": 0.25,
+    "prs_z_clamp": 3.0,
+    "serology_logOR": {
+      "primary_composite": {"asca_igg": 0.982, "ompc": 0.802, "anca": 0.0},
+      "surgery_sensitivity": {"asca_igg": 0.920, "ompc": 1.273, "anca": 0.0}
+    },
+    "serology_applies_to": ["CD"],
+    "ancestry_conditioned": false
+  },
+
+  "risk": {
+    "beta0_12mo": -2.0425,
+    "beta0_24mo": -1.4659,
+    "beta_severity_per10": 0.4879,
+    "beta_constitutional": 0.50,
+    "beta_alert": 0.30,
+    "shrinkage_rationale": "Both terms are SHRUNK from their published effect sizes because the published estimates are largely unadjusted for concurrent severity, and GERI-B already carries that severity. Bertha's serology odds ratios (2.67 and 2.23) contrast complicated with uncomplicated disease; a patient scoring 65 on GERI-B is already most of the way to 'complicated', so adding the full log-odds counts the same signal twice. The phenotype alert double-counts more directly still: a fistula contributes 11 points to GERI-B and also fires the alert. A shrinkage of 0.5 and 0.3 is a placeholder, not an estimate. The correct values come from milestone M2's incremental-value test — fitting the composite with and without the constitutional layer is the same comparison that decides the M2 go/no-go, so this coefficient and that milestone are answered by one analysis.",
+    "access_offset_reference": 0.0,
+    "high_threshold_12mo": 0.25,
+    "risk_bands": [[0.10, "Low"], [0.25, "Moderate"], [0.50, "High"], [1.01, "Very high"]],
+    "band_rationale": "The BAND is the deliverable; the point estimate is provisional and is not calibrated in the tails. Displaying 97.7% asserts a precision these coefficients cannot support. Report the band, show the point estimate beside it, and say which it is. Revisit once M2 supplies a calibration slope.",
+    "derivation": "beta_severity_per10 = ln(1.05)*10 = 0.4879, from Swaminathan 2024's baseline DSI aOR of 1.05 per point (95% CI 1.02-1.09) for a complicated course. beta0_12mo places the cohort median DSI of 23 (IQR 12-39, Swaminathan 2024 Table 1) at the observed 12-month event rate of 28.5% (Swaminathan 2022): logit(0.285) - 0.4879*2.3 = -2.0425. The 24-month intercept is shifted by ln of the marginal odds ratio between the 41.5% and 28.5% event rates, ln(1.780) = 0.5766.",
+    "known_deficiency": "This prior is deliberately conservative and UNDER-SEPARATES the tails. It puts a DSI of 12 at 18.9% risk where the reported sensitivity of 84% and specificity of 72% at threshold 23 imply about 8.1% below threshold and 54.5% above. A steeper slope fitted to those two group means (0.11853 per point) was tested and rejected: it drives a DSI of 65 to a 12-month risk above 99%, which no reported group approaches. The published aOR is an ADJUSTED residual per-point effect and so understates the marginal association, but it is the only per-point estimate that exists, and over-fitting a slope to two interpolated group means is the worse error. Refit on the cohort at M2 and report the calibration slope; correcting this under-separation is a named M2 deliverable, not an accepted property.",
+    "comment": "beta_constitutional multiplies the summed log-odds from PRS and serology. access_offset_reference is the counterfactual guideline-concordant-access level substituted at deployment for the patient's observed access covariates."
+  },
+
+  "mci": {
+    "field_weights": {
+      "crp_mgL": 3, "albumin_gdl": 3, "hb_gdl": 3, "stool_freq": 2,
+      "daily_activity": 2, "anorectal_symptoms": 1, "extent": 2,
+      "biologic_use": 3, "steroid_12mo": 2, "hospitalisation_12mo": 2,
+      "mucosal_lesions": 4, "asca_igg": 2, "ompc": 2, "prs_percentile": 3,
+      "insurance": 1, "ambulatory_visits_12mo": 1, "distance_km": 1, "adi_national_pct": 1
+    },
+    "tier_requirements": {
+      "0": ["crp_mgL", "albumin_gdl", "hb_gdl", "biologic_use", "steroid_12mo"],
+      "1": ["mucosal_lesions"],
+      "2": ["asca_igg", "ompc"],
+      "3": ["prs_percentile", "pi_afr"]
+    }
+  },
+
+  "benchmarks": {
+    "comment": "The bar GERI must clear. All verified against the source PDFs, not against secondary transcription.",
+    "dsi_auroc_24mo": {"all_ibd": [0.82, 0.76, 0.89], "cd": [0.81, 0.72, 0.90], "uc": [0.88, 0.80, 0.96]},
+    "dsi_auroc_12mo": {"all_ibd": 0.84, "cd": 0.83, "uc": 0.90},
+    "dsi_threshold": {"all_ibd": 23, "cd_2024": 23, "cd_2022": 22, "uc": 29},
+    "dsi_sens_spec_at_23": {"all_ibd": [0.86, 0.71], "cd": [0.84, 0.76], "uc": [0.89, 0.65]},
+    "dsi_sens_spec_uc_at_29": [0.85, 0.78],
+    "dsi_icc": {"cd": 0.93, "uc": 0.97},
+    "dsi_cronbach_alpha": {"cd": 0.64, "uc": 0.79},
+    "dsi_weighted_kappa_weakest": {"anorectal_symptoms_cd": 0.32, "daily_activity_cd": 0.45},
+    "incremental_auroc_all_ibd": {"without_dsi": 0.76, "with_dsi": 0.84, "p": "<0.01"},
+    "event_rate": {"12mo": 0.285, "24mo": 0.415},
+    "median_weeks_to_first_complication": 23,
+    "median_dsi_iqr": {"all_ibd": [23, 12, 39], "cd": [21, 10, 31], "uc": [31, 14, 60]},
+    "median_dsi_by_endoscopic_activity": {"active": [28, 19, 41], "inactive": [12, 5, 21], "note": "Swaminathan 2022 — endoscopic activity, NOT complicated course. Do not relabel."},
+    "validation_cohort_european_pct": {"swaminathan_2024": 95.7, "swaminathan_2022": 98.3}
+  }
+};
+/* ============================ numerics ============================ */
+const A=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+const B=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+const C=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+const D=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+const P_LOW=0.02425,P_HIGH=1-0.02425;
+function qnorm(p){
+  if(p<=0)return -Infinity; if(p>=1)return Infinity;
+  if(p<P_LOW){const q=Math.sqrt(-2*Math.log(p));
+    return (((((C[0]*q+C[1])*q+C[2])*q+C[3])*q+C[4])*q+C[5])/((((D[0]*q+D[1])*q+D[2])*q+D[3])*q+1);}
+  if(p>P_HIGH){const q=Math.sqrt(-2*Math.log(1-p));
+    return -(((((C[0]*q+C[1])*q+C[2])*q+C[3])*q+C[4])*q+C[5])/((((D[0]*q+D[1])*q+D[2])*q+D[3])*q+1);}
+  const q=p-0.5,r=q*q;
+  return (((((A[0]*r+A[1])*r+A[2])*r+A[3])*r+A[4])*r+A[5])*q/(((((B[0]*r+B[1])*r+B[2])*r+B[3])*r+B[4])*r+1);
+}
+const sig=x=>x>=0?1/(1+Math.exp(-x)):Math.exp(x)/(1+Math.exp(x));
+const clamp=(x,lo,hi)=>x<lo?lo:(x>hi?hi:x);
+const has=v=>v!==null&&v!==undefined&&v!=='';
+
+/* ============================ scoring ============================ */
+function dsiCategories(p){
+  const c={};
+  if(has(p.crp_mgL)) c.crp = p.crp_mgL<=3?'normal':(p.crp_mgL<=5?'slight':'elevated');
+  if(has(p.albumin_gdl)) c.albumin = p.albumin_gdl<3.5?'low':'normal';
+  if(has(p.hb_gdl)) c.anaemia = p.hb_gdl < (p.sex==='male'?13:12) ? 'yes':'no';
+  ['mucosal_lesions','biologic_use','daily_activity','stool_freq','anorectal_symptoms','extent',
+   'fistula','perianal_abscess','stricture','stoma','resection','abdominal_pain',
+   'nocturnal_bm','rectal_bleeding'].forEach(k=>{ if(has(p[k])) c[k]=p[k]; });
+  c.steroid_12mo = p.steroid_12mo?'yes':'no';
+  if(p.subtype==='UC') c.hospitalisation_12mo = p.hospitalisation_12mo?'yes':'no';
+  return c;
+}
+function computeDSI(p){
+  const table=COEF.dsi[p.subtype], cat=dsiCategories(p), items=[], missing=[];
+  let total=0;
+  for(const [item,levels] of Object.entries(table)){
+    const lvl=cat[item];
+    if(lvl===undefined||!(lvl in levels)){missing.push(item);continue;}
+    total+=levels[lvl];
+    items.push({item,level:lvl,points:levels[lvl],max_points:Math.max(...Object.values(levels))});
+  }
+  const complete=missing.length===0;
+  return {total:complete?total:null,partial_total:total,items,missing,complete,
+          endoscopy_missing:missing.includes('mucosal_lesions')};
+}
+function computeGeriB(p){
+  const table=COEF.dsi[p.subtype], care=new Set(COEF.care_pathway_items[p.subtype]);
+  const cat=dsiCategories(p), lab=COEF.continuous_labs;
+  const removed=[...care].reduce((s,i)=>s+Math.max(...Object.values(table[i])),0);
+  const contributions=[], missing=[];
+  let raw=0, attainable=0;
+  for(const [item,levels] of Object.entries(table)){
+    if(care.has(item)) continue;
+    const wmax=Math.max(...Object.values(levels));
+    let pts,mode;
+    if(item==='crp'&&has(p.crp_mgL)){
+      const c=lab.crp, crp=Math.max(p.crp_mgL,0.01);
+      pts=wmax*sig((Math.log(crp)-Math.log(c.midpoint_mgL))/c.slope_log); mode='continuous';
+    }else if(item==='albumin'&&has(p.albumin_gdl)){
+      const c=lab.albumin;
+      pts=wmax*clamp((c.upper_gdl-p.albumin_gdl)/c.span_gdl,0,1); mode='continuous';
+    }else if(item==='anaemia'&&has(p.hb_gdl)){
+      const c=lab.anaemia, ref=p.sex==='male'?c.hb_ref_male_gdl:c.hb_ref_female_gdl;
+      pts=wmax*clamp((ref-p.hb_gdl)/c.span_gdl,0,1); mode='continuous';
+    }else{
+      const lvl=cat[item];
+      if(lvl===undefined||!(lvl in levels)){missing.push(item);continue;}
+      pts=levels[lvl]; mode='categorical';
+    }
+    raw+=pts; attainable+=wmax;
+    contributions.push({item,points_raw:pts,max_points:wmax,mode});
+  }
+  if(attainable===0) return {score:null,raw:0,attainable:0,removed_points:removed,
+    removed_items:[...care].sort(),contributions:[],missing};
+  const scale=100/attainable;
+  contributions.forEach(c=>{c.points_scaled=c.points_raw*scale;c.max_points_scaled=c.max_points*scale;});
+  return {score:clamp(raw*scale,0,100),raw,attainable,scale,removed_points:removed,
+          removed_items:[...care].sort(),contributions,missing};
+}
+function computeAlert(p){
+  const r=[];
+  if(p.subtype==='CD'){
+    if(p.fistula==='present')r.push("Fistulising disease");
+    if(p.perianal_abscess==='present')r.push("Perianal abscess");
+    if(p.stricture==='present')r.push("Fibrostenotic disease");
+    if(p.stoma==='present')r.push("Stoma");
+    if(p.resection==='one_lt40'||p.resection==='one_ge40')r.push("Prior intestinal resection");
+    if(p.upper_gi)r.push("Upper-GI involvement");
+  }else{
+    if(p.extent==='extensive'&&(p.steroid_12mo||p.hospitalisation_12mo))
+      r.push("Extensive colitis with steroid or hospitalisation in 12 months");
+  }
+  if(p.eim)r.push("Extraintestinal manifestation (uveitis / sacroiliitis / PSC)");
+  if(has(p.age_at_dx)&&p.age_at_dx<17)r.push("Diagnosed before age 17");
+  return {fired:r.length>0,reasons:r};
+}
+function computeACI(p,geriB,alertFired){
+  const c=COEF.aci, g=c.care_propensity;
+  const expected=sig(g.gamma0+g.gamma_severity*(geriB/100)+g.gamma_alert*(alertFired?1:0));
+  const bio=p.biologic_use;
+  const observed = !has(bio) ? null : (bio==='never'?0:1);
+  const care_deficit = observed===null?0:clamp(expected-observed,0,1);
+  const w=c.structural_barriers, hits=[]; let barrier=0;
+  const add=(cond,key,label)=>{ if(cond){barrier+=w[key];hits.push({key,label,weight:w[key]});} };
+  add(p.insurance==='uninsured','uninsured','Uninsured');
+  add(p.insurance==='medicaid','medicaid','Medicaid');
+  add(!!p.insurance_gap_12mo,'insurance_gap_12mo','Coverage gap in past 12 months');
+  add(has(p.distance_km)&&p.distance_km>80,'distance_gt_80km','Over 80 km from the IBD centre');
+  add(has(p.ambulatory_visits_12mo)&&p.ambulatory_visits_12mo<2,'ambulatory_visits_lt2','Fewer than 2 ambulatory visits in 12 months');
+  add(!!p.endoscopy_ordered_not_done,'endoscopy_ordered_not_done','Endoscopy ordered but not completed');
+  add(has(p.adi_national_pct)&&p.adi_national_pct>=80,'adi_ge_80','Area deprivation index at or above the 80th percentile');
+  add(!!p.steroid_12mo&&bio==='never','steroid_without_biologic','Steroids in the past year with no advanced therapy');
+  add(!!p.hospitalisation_12mo&&bio==='never','hospitalised_without_biologic','Hospitalised in the past year with no advanced therapy');
+  barrier=clamp(barrier,0,1);
+  const score=100*(c.weight_care_deficit*care_deficit+c.weight_structural*barrier);
+  return {score,expected_care:expected,observed_care:observed,care_deficit,
+          structural_barrier:barrier,barrier_hits:hits,high:score>=c.high_threshold,
+          threshold:c.high_threshold};
+}
+function computeConstitutional(p,outcome='primary_composite'){
+  const c=COEF.constitutional, parts=[]; let lo=0;
+  if(has(p.prs_percentile)){
+    const z=clamp(qnorm(clamp(p.prs_percentile,0.5,99.5)/100),-c.prs_z_clamp,c.prs_z_clamp);
+    const t=c.beta_prs_per_sd*z; lo+=t;
+    parts.push({source:'PRS',detail:`${Math.round(p.prs_percentile)}th percentile (z=${z.toFixed(2)})`,log_odds:t});
+  }
+  if(c.serology_applies_to.includes(p.subtype)){
+    const w=c.serology_logOR[outcome];
+    [['asca_igg','IgG ASCA positive'],['ompc','Anti-OmpC positive'],['anca','ANCA positive']]
+      .forEach(([k,label])=>{ if(p[k]==='positive'&&w[k]!==0){lo+=w[k];parts.push({source:'Serology',detail:label,log_odds:w[k]});} });
+  }
+  return {log_odds:lo,parts,ancestry_conditioned:c.ancestry_conditioned};
+}
+const CONT=['crp_mgL','albumin_gdl','hb_gdl','prs_percentile','pi_afr','distance_km','adi_national_pct','ambulatory_visits_12mo'];
+const BOOLF=['steroid_12mo','hospitalisation_12mo'];
+function computeMCI(p){
+  const m=COEF.mci, req=m.tier_requirements, sub=p.subtype;
+  const gapsFor=fields=>fields.filter(f=>{
+    if(f==='hospitalisation_12mo'&&sub==='CD')return false;
+    const ok = BOOLF.includes(f) ? (p[f]!==null&&p[f]!==undefined) : has(p[f]);
+    return !ok;
+  });
+  const gaps={}; ['0','1','2','3'].forEach(l=>gaps[l]=gapsFor(req[l]));
+  let tier;
+  if(gaps['0'].length){tier=-1;}
+  else{tier=0; for(const l of ['1','2','3']){ if(gaps[l].length)break; tier=+l; }}
+  let got=0,tot=0;
+  for(const [f,wt] of Object.entries(m.field_weights)){
+    if(f==='hospitalisation_12mo'&&sub==='CD')continue;
+    tot+=wt;
+    const ok = BOOLF.includes(f) ? (p[f]!==null&&p[f]!==undefined) : has(p[f]);
+    if(ok)got+=wt;
+  }
+  const names={'-1':'Incomplete','0':'Tier 0 — EHR-only (non-endoscopic)','1':'Tier 1 — Clinical',
+               '2':'Tier 2 — Serologic','3':'Tier 3 — Genomic'};
+  return {tier,tier_name:names[String(tier)],coverage_pct:tot?100*got/tot:0,gaps,blocking:gaps['0']};
+}
+function score(patient){
+  const p={...patient};
+  const dsi=computeDSI(p), b=computeGeriB(p), bs=b.score;
+  const alert=computeAlert(p);
+  const aci=computeACI(p,bs===null?0:bs,alert.fired);
+  const mci=computeMCI(p);
+  let con=computeConstitutional(p);
+  if(mci.tier<3) con=computeConstitutional({...p,prs_percentile:null});
+  if(mci.tier<2) con=computeConstitutional({...p,prs_percentile:null,asca_igg:null,ompc:null,anca:null});
+  const r=COEF.risk;
+  const eta = r.beta_severity_per10*((bs||0)/10) + r.beta_constitutional*con.log_odds
+            + r.beta_alert*(alert.fired?1:0) + r.access_offset_reference;
+  const scoreable = bs!==null && mci.tier>=0;
+  const risk12 = scoreable ? sig(r.beta0_12mo+eta) : null;
+  const risk24 = scoreable ? sig(r.beta0_24mo+eta) : null;
+  let band=null;
+  if(risk12!==null) for(const [cut,name] of r.risk_bands){ if(risk12<cut){band=name;break;} }
+  const highRisk = risk12!==null && risk12>=r.high_threshold_12mo;
+  let quadrant,action;
+  if(!scoreable){quadrant='not_scoreable';action="Not scoreable. Required inputs are missing; see the measurement-confidence gaps. No risk estimate is reported rather than one built on absent data.";}
+  else if(highRisk&&aci.high){quadrant='escalate_and_navigate';action="Escalate therapy and address the access barrier. High predicted risk with evidence of under-treatment relative to biology.";}
+  else if(highRisk){quadrant='escalate';action="Escalate therapy and tighten monitoring. High predicted risk; care received is consistent with biology.";}
+  else if(aci.high){quadrant='equity_flag';action="Do not act on the reassuring score. Predicted risk is low but the inputs are care-contaminated: this patient's biology resembles patients who are on advanced therapy, and they are not. Obtain the missing objective data before concluding the disease is quiescent.";}
+  else{quadrant='routine';action="Routine surveillance. Low predicted risk with no evidence of access contamination.";}
+  return {schema:'geri-result/1.0',coefficient_version:COEF.version,subtype:p.subtype,
+    dsi:{total:dsi.total,partial_total:dsi.partial_total,complete:dsi.complete,
+         endoscopy_missing:dsi.endoscopy_missing,missing:dsi.missing,items:dsi.items,
+         threshold:COEF.benchmarks.dsi_threshold[p.subtype==='UC'?'uc':'cd_2024']},
+    geri_b:{score:bs,attainable:b.attainable,removed_points:b.removed_points,
+            removed_items:b.removed_items,contributions:b.contributions,missing:b.missing},
+    aci,alert,constitutional:{...con,suppressed_by_tier:mci.tier<3},mci,
+    geri_r:{risk_12mo:risk12,risk_24mo:risk24,high:highRisk,threshold:r.high_threshold_12mo,
+            band,scoreable,eta_12mo:scoreable?r.beta0_12mo+eta:null},
+    quadrant,action,
+    disclaimer:"Provisional coefficients derived from published effect sizes. Not fitted to the GutEquity cohort. Not for clinical use."};
+}
+</script>
+<script>
+/* ============================ field spec ============================ */
+const LAYERS=[
+ {code:'L1',name:'Inflammatory burden',note:'Labs and mucosa',fields:[
+   {k:'sex',t:'sel',l:'Sex',o:[['female','Female'],['male','Male']]},
+   {k:'age_at_dx',t:'num',l:'Age at diagnosis',step:1,min:0,max:99},
+   {k:'crp_mgL',t:'num',l:'CRP',u:'mg/L',step:0.1,min:0,max:300},
+   {k:'albumin_gdl',t:'num',l:'Albumin',u:'g/dL',step:0.1,min:1,max:6},
+   {k:'hb_gdl',t:'num',l:'Haemoglobin',u:'g/dL',step:0.1,min:4,max:20},
+   {k:'mucosal_lesions',t:'sel',l:'Mucosal lesions',tier:1,
+    o:{CD:[['none','None'],['small','Small lesions'],['large','Large or deep lesions']],
+       UC:[['none','None'],['erosions','Active erosions'],['ulcers','Active ulcers']]},
+    hint:{CD:'SES-CD',UC:'Mayo endoscopic subscore / UCEIS'}},
+ ]},
+ {code:'L2',name:'Structural damage and phenotype',note:'Montreal classification, operative and imaging reports',fields:[
+   {k:'extent',t:'sel',l:'Disease extent',
+    o:{CD:[['limited','Limited'],['extensive','Extensive (≥40 cm ileal or pancolitis)']],
+       UC:[['distal','Distal (E1–E2)'],['extensive','Extensive colitis (E3)']]}},
+   {k:'fistula',t:'sel',l:'Fistula',sub:'CD',o:[['absent','Absent'],['present','Present']]},
+   {k:'perianal_abscess',t:'sel',l:'Perianal abscess',sub:'CD',o:[['absent','Absent'],['present','Present']]},
+   {k:'stricture',t:'sel',l:'Stricture',sub:'CD',o:[['absent','Absent'],['present','Present']]},
+   {k:'stoma',t:'sel',l:'Stoma',sub:'CD',o:[['absent','Absent'],['present','Present']]},
+   {k:'resection',t:'sel',l:'Intestinal resection',sub:'CD',
+    o:[['none','None'],['one_lt40','One, <40 cm'],['one_ge40','One, ≥40 cm']]},
+   {k:'upper_gi',t:'chk',l:'Upper-GI involvement',sub:'CD'},
+   {k:'eim',t:'chk',l:'Extraintestinal manifestation'},
+ ]},
+ {code:'L3',name:'Impact on the patient',note:'Record the patient-reported value where the two diverge',fields:[
+   {k:'daily_activity',t:'sel',l:'Daily activity impact',
+    o:[['not_significant','Not significantly affected'],['significant','Significantly affected']]},
+   {k:'stool_freq',t:'sel',l:'Loose stools',
+    o:{CD:[['lt10_wk','<10 per week'],['ge10_wk','≥10 per week']],
+       UC:[['no_change','No change from baseline'],['plus1','+1 per day'],['plus2_or_more','+2 or more per day']]}},
+   {k:'abdominal_pain',t:'sel',l:'Abdominal pain',sub:'CD',o:[['infrequent','Infrequent'],['daily','Daily']]},
+   {k:'nocturnal_bm',t:'sel',l:'Nocturnal bowel movements',sub:'UC',o:[['absent','Absent'],['present','Present']]},
+   {k:'rectal_bleeding',t:'sel',l:'Rectal bleeding',sub:'UC',o:[['absent','Absent'],['present','Present']]},
+   {k:'anorectal_symptoms',t:'sel',l:'Anorectal symptoms',o:[['none','None'],['present','At least one']]},
+ ]},
+ {code:'L4',name:'Constitutional risk',note:'Genomic and serologic — ancestry, never race',fields:[
+   {k:'pi_afr',t:'num',l:'African ancestry proportion',tier:3,step:0.01,min:0,max:1,
+    hint:'Global π from RFMix2 / FLARE'},
+   {k:'prs_percentile',t:'num',l:'Ancestry-calibrated PRS',u:'percentile',tier:3,step:1,min:0,max:100},
+   {k:'asca_igg',t:'sel',l:'IgG ASCA',tier:2,o:[['negative','Negative'],['positive','Positive']]},
+   {k:'ompc',t:'sel',l:'Anti-OmpC',tier:2,o:[['negative','Negative'],['positive','Positive']]},
+   {k:'anca',t:'sel',l:'ANCA',tier:2,o:[['negative','Negative'],['positive','Positive']],
+    hint:'Collected, not scored'},
+ ]},
+ {code:'L5',name:'Care pathway and access',note:'Scores no severity — feeds the ACI only',care:true,fields:[
+   {k:'biologic_use',t:'sel',l:'Biologic or immunomodulator',care:true,
+    o:[['never','Never used'],['used_improved','Used, some improvement'],['used_not_improved','Used, no improvement']]},
+   {k:'steroid_12mo',t:'chk',l:'Systemic steroids in past year',care:true},
+   {k:'hospitalisation_12mo',t:'chk',l:'IBD hospitalisation in past year',care:true},
+   {k:'insurance',t:'sel',l:'Insurance',o:[['commercial','Commercial'],['medicaid','Medicaid'],['medicare','Medicare'],['uninsured','Uninsured']]},
+   {k:'insurance_gap_12mo',t:'chk',l:'Coverage gap in past year'},
+   {k:'distance_km',t:'num',l:'Distance to IBD centre',u:'km',step:1,min:0,max:2000},
+   {k:'ambulatory_visits_12mo',t:'num',l:'Ambulatory visits, 12 mo',step:1,min:0,max:60},
+   {k:'endoscopy_ordered_not_done',t:'chk',l:'Endoscopy ordered, not completed'},
+   {k:'adi_national_pct',t:'num',l:'Area deprivation index',u:'national pct',step:1,min:0,max:100},
+ ]},
+];
+
+const LABELS={mucosal_lesions:'Mucosal lesions',crp:'CRP',albumin:'Albumin',anaemia:'Anaemia',
+ stool_freq:'Stool frequency',daily_activity:'Daily activity',anorectal_symptoms:'Anorectal symptoms',
+ extent:'Disease extent',fistula:'Fistula',perianal_abscess:'Perianal abscess',stricture:'Stricture',
+ stoma:'Stoma',resection:'Resection',abdominal_pain:'Abdominal pain',nocturnal_bm:'Nocturnal BM',
+ rectal_bleeding:'Rectal bleeding',biologic_use:'Biologic / IMM use',steroid_12mo:'Steroid use',
+ hospitalisation_12mo:'Hospitalisation',crp_mgL:'CRP',albumin_gdl:'Albumin',hb_gdl:'Haemoglobin',
+ asca_igg:'IgG ASCA',ompc:'Anti-OmpC',prs_percentile:'PRS percentile',pi_afr:'Ancestry proportion'};
+
+/* ============================ example cases ============================ */
+const CASES={
+ "Equity quadrant — severe biology, never offered advanced therapy":{
+  subtype:'CD',sex:'female',age_at_dx:22,crp_mgL:11,albumin_gdl:3.1,hb_gdl:10.4,
+  mucosal_lesions:'large',fistula:'present',perianal_abscess:'absent',stricture:'absent',
+  stoma:'absent',resection:'none',extent:'extensive',stool_freq:'ge10_wk',
+  daily_activity:'significant',anorectal_symptoms:'present',abdominal_pain:'daily',
+  upper_gi:false,eim:false,biologic_use:'never',steroid_12mo:true,hospitalisation_12mo:false,
+  insurance:'medicaid',insurance_gap_12mo:true,distance_km:140,ambulatory_visits_12mo:1,
+  endoscopy_ordered_not_done:false,adi_national_pct:91,asca_igg:'positive',ompc:'positive',
+  anca:'negative',prs_percentile:88,pi_afr:0.82},
+ "High risk, adequately treated":{
+  subtype:'CD',sex:'male',age_at_dx:31,crp_mgL:9,albumin_gdl:3.3,hb_gdl:12,
+  mucosal_lesions:'large',fistula:'absent',perianal_abscess:'absent',stricture:'present',
+  stoma:'absent',resection:'one_lt40',extent:'extensive',stool_freq:'ge10_wk',
+  daily_activity:'significant',anorectal_symptoms:'none',abdominal_pain:'daily',
+  upper_gi:false,eim:false,biologic_use:'used_not_improved',steroid_12mo:true,
+  hospitalisation_12mo:true,insurance:'commercial',insurance_gap_12mo:false,distance_km:12,
+  ambulatory_visits_12mo:6,endoscopy_ordered_not_done:false,adi_national_pct:34,
+  asca_igg:'positive',ompc:'negative',anca:'negative',prs_percentile:71,pi_afr:0.78},
+ "Routine — quiescent, well served":{
+  subtype:'UC',sex:'female',age_at_dx:44,crp_mgL:1.5,albumin_gdl:4.2,hb_gdl:13.4,
+  mucosal_lesions:'none',daily_activity:'not_significant',stool_freq:'no_change',
+  extent:'distal',nocturnal_bm:'absent',anorectal_symptoms:'none',rectal_bleeding:'absent',
+  eim:false,biologic_use:'used_improved',steroid_12mo:false,hospitalisation_12mo:false,
+  insurance:'commercial',insurance_gap_12mo:false,distance_km:8,ambulatory_visits_12mo:4,
+  endoscopy_ordered_not_done:false,adi_national_pct:22,asca_igg:'negative',ompc:'negative',
+  anca:'positive',prs_percentile:40,pi_afr:0.71},
+ "Tier 0 — safety-net clinic, no endoscopy or genotype":{
+  subtype:'UC',sex:'male',age_at_dx:29,crp_mgL:7.5,albumin_gdl:3.2,hb_gdl:11.1,
+  daily_activity:'significant',stool_freq:'plus2_or_more',extent:'extensive',
+  nocturnal_bm:'present',anorectal_symptoms:'present',rectal_bleeding:'present',eim:true,
+  biologic_use:'never',steroid_12mo:true,hospitalisation_12mo:true,insurance:'uninsured',
+  insurance_gap_12mo:true,distance_km:95,ambulatory_visits_12mo:0,
+  endoscopy_ordered_not_done:true,adi_national_pct:88},
+};
+
+
+/* ============================ state + form ============================ */
+let P={subtype:'CD'}, PREV=null;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=(x,d=1)=>x===null||x===undefined?'—':Number(x).toFixed(d);
+
+function renderForm(){
+  const sub=P.subtype;
+  document.getElementById('form').innerHTML=LAYERS.map((L,li)=>{
+    const fs=L.fields.filter(f=>!f.sub||f.sub===sub);
+    if(!fs.length)return '';
+    return `<details class="layer${L.care?' care':''}" ${li<3||L.care?'open':''}>
+      <summary><span class="lcode">${L.code}</span> ${esc(L.name)}<span class="lnote">${esc(L.note)}</span></summary>
+      <div class="fields">${fs.map(f=>fieldHTML(f,sub)).join('')}</div></details>`;
+  }).join('');
+  document.getElementById('form').querySelectorAll('[data-k]').forEach(el=>{
+    el.addEventListener('input',()=>{
+      const k=el.dataset.k;
+      if(el.type==='checkbox')P[k]=el.checked;
+      else if(el.type==='number')P[k]=el.value===''?null:parseFloat(el.value);
+      else P[k]=el.value===''?null:el.value;
+      render();
+    });
+  });
+}
+function fieldHTML(f,sub){
+  const v=P[f.k], care=f.care?' care':'';
+  const tier=f.tier?`<span class="pill t${f.tier}">T${f.tier}</span>`:'';
+  const hint=typeof f.hint==='object'?f.hint[sub]:f.hint;
+  const unit=f.u?`<span class="pill unit">${esc(f.u)}</span>`:'';
+  if(f.t==='chk')
+    return `<div class="f${care}"><label class="chk"><input type="checkbox" data-k="${f.k}" ${v?'checked':''}>
+      <span>${esc(f.l)}</span>${tier}</label></div>`;
+  const lab=`<label for="fld_${f.k}">${esc(f.l)}${unit}${tier}${hint?`<span class="pill unit">${esc(hint)}</span>`:''}</label>`;
+  if(f.t==='num')
+    return `<div class="f${care}">${lab}<input id="fld_${f.k}" type="number" data-k="${f.k}"
+      step="${f.step}" min="${f.min}" max="${f.max}" value="${v??''}" placeholder="—"></div>`;
+  const opts=Array.isArray(f.o)?f.o:f.o[sub];
+  return `<div class="f${care}">${lab}<select id="fld_${f.k}" data-k="${f.k}">
+    <option value="">— not recorded —</option>
+    ${opts.map(([ov,ol])=>`<option value="${ov}" ${v===ov?'selected':''}>${esc(ol)}</option>`).join('')}
+    </select></div>`;
+}
+
+/* ============================ quadrant chart ============================ */
+function quadrantSVG(r){
+  const W=560,H=316, ml=46, mr=18, mt=20, mb=44;
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const xt=COEF.risk.high_threshold_12mo*100, yt=COEF.aci.high_threshold;
+  const X=v=>ml+iw*clamp(v,0,100)/100, Y=v=>mt+ih*(1-clamp(v,0,100)/100);
+  // Keep the marker clear of the frame: extreme cases (92% risk, ACI 92) otherwise
+  // sit half on the border, where the ring reads as a smudge rather than a point.
+  const Xm=v=>clamp(X(v),ml+9,ml+iw-9), Ym=v=>clamp(Y(v),mt+9,mt+ih-9);
+  const q=r.quadrant;
+  const cells=[
+    ['routine',      0, xt, 0, yt, 'var(--sev-1)', 'ROUTINE',           'left'],
+    ['escalate',     xt,100, 0, yt, 'var(--sev-3)', 'ESCALATE',          'right'],
+    ['equity_flag',  0, xt, yt,100, 'var(--flag)',  'EQUITY FLAG',       'left'],
+    ['escalate_and_navigate', xt,100, yt,100, 'var(--sev-4)','ESCALATE + NAVIGATE','right'],
+  ];
+  const px = r.geri_r.risk_12mo===null?null:Xm(r.geri_r.risk_12mo*100);
+  const py = Ym(r.aci.score);
+  const parts=[];
+  cells.forEach(c=>{
+    const [key,x0,x1,y0,y1,col,label,side]=c;
+    const on = q===key;
+    parts.push(`<rect x="${X(x0)}" y="${Y(y1)}" width="${X(x1)-X(x0)}" height="${Y(y0)-Y(y1)}"
+      fill="${col}" opacity="${on?0.20:0.055}"/>`);
+    if(on) parts.push(`<rect x="${X(x0)+.75}" y="${Y(y1)+.75}" width="${X(x1)-X(x0)-1.5}"
+      height="${Y(y0)-Y(y1)-1.5}" fill="none" stroke="${col}" stroke-width="1.5" opacity="0.55"/>`);
+    const lx = side==='left' ? X(x0)+9 : X(x1)-9;
+    parts.push(`<text x="${lx}" y="${Y(y1)+16}" text-anchor="${side==='left'?'start':'end'}"
+      font-size="9.5" font-weight="700" letter-spacing="0.9" fill="${col}"
+      opacity="${on?1:0.55}" font-family="var(--f-ui)">${label}</text>`);
+  });
+  // threshold guides, labelled with the value they mark
+  parts.push(`<line x1="${X(xt)}" y1="${Y(0)}" x2="${X(xt)}" y2="${Y(100)}"
+    stroke="var(--rule-2)" stroke-width="1" stroke-dasharray="4 3"/>`);
+  parts.push(`<line x1="${X(0)}" y1="${Y(yt)}" x2="${X(100)}" y2="${Y(yt)}"
+    stroke="var(--rule-2)" stroke-width="1" stroke-dasharray="4 3"/>`);
+  parts.push(`<text x="${X(xt)+5}" y="${mt+11}" font-size="9" fill="var(--ink-3)"
+    font-family="var(--f-num)">escalate ≥ ${xt}%</text>`);
+  parts.push(`<text x="${ml+4}" y="${Y(yt)-5}" font-size="9" fill="var(--ink-3)"
+    font-family="var(--f-num)">flag ≥ ${yt}</text>`);
+  // frame + ticks
+  parts.push(`<rect x="${ml}" y="${mt}" width="${iw}" height="${ih}" fill="none" stroke="var(--rule-2)"/>`);
+  [0,25,50,75,100].forEach(v=>{
+    parts.push(`<line x1="${X(v)}" y1="${mt+ih}" x2="${X(v)}" y2="${mt+ih+4}" stroke="var(--rule-2)"/>`);
+    parts.push(`<text x="${X(v)}" y="${mt+ih+16}" text-anchor="middle" font-size="9.5"
+      fill="var(--ink-3)" font-family="var(--f-num)">${v}</text>`);
+  });
+  [0,yt,100].forEach(v=>{
+    parts.push(`<line x1="${ml-4}" y1="${Y(v)}" x2="${ml}" y2="${Y(v)}" stroke="var(--rule-2)"/>`);
+    parts.push(`<text x="${ml-8}" y="${Y(v)+3.5}" text-anchor="end" font-size="9.5"
+      fill="var(--ink-3)" font-family="var(--f-num)">${v}</text>`);
+  });
+  parts.push(`<text x="${ml+iw/2}" y="${H-7}" text-anchor="middle" font-size="10"
+    fill="var(--ink-2)" font-family="var(--f-ui)">GERI-R · 12-month risk (%)</text>`);
+  parts.push(`<text x="13" y="${mt+ih/2}" text-anchor="middle" font-size="10"
+    fill="var(--ink-2)" font-family="var(--f-ui)"
+    transform="rotate(-90 13 ${mt+ih/2})">Access contamination · ACI</text>`);
+  // the patient: drop-lines to both axes, then a ringed marker
+  if(px===null){
+    parts.push(`<text x="${ml+iw/2}" y="${mt+ih/2}" text-anchor="middle" font-size="11.5"
+      fill="var(--ink-3)" font-family="var(--f-ui)">Not scoreable — inputs missing</text>`);
+  }else{
+    parts.push(`<line x1="${px}" y1="${py}" x2="${px}" y2="${mt+ih}" stroke="var(--ink)"
+      stroke-width="1" stroke-dasharray="2 3" opacity="0.42"/>`);
+    parts.push(`<line x1="${px}" y1="${py}" x2="${ml}" y2="${py}" stroke="var(--ink)"
+      stroke-width="1" stroke-dasharray="2 3" opacity="0.42"/>`);
+    parts.push(`<circle cx="${px}" cy="${py}" r="11" fill="var(--ink)" opacity="0.10"/>`);
+    parts.push(`<circle cx="${px}" cy="${py}" r="5.5" fill="var(--surface)"
+      stroke="var(--ink)" stroke-width="2.25"/>`);
+    parts.push(`<circle cx="${px}" cy="${py}" r="2" fill="var(--ink)"/>`);
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img"
+    aria-label="Twelve-month risk against access contamination. This patient falls in the ${q.replace(/_/g,' ')} quadrant.">
+    ${parts.join('')}</svg>`;
+}
+
+/* ============================ waterfall ============================ */
+function waterfall(r){
+  const care=new Set(COEF.care_pathway_items[r.subtype]);
+  const table=COEF.dsi[r.subtype];
+  const order=Object.keys(table).sort((a,b)=>
+    Math.max(...Object.values(table[b]))-Math.max(...Object.values(table[a])));
+  const rows=order.map(item=>{
+    const mx=Math.max(...Object.values(table[item]));
+    const hit=r.dsi.items.find(i=>i.item===item);
+    const isCare=care.has(item), miss=!hit, pts=hit?hit.points:0;
+    const val = miss ? 'not rec.' : (isCare ? pts+'&thinsp;/&thinsp;'+mx+' →' : pts+'&thinsp;/&thinsp;'+mx);
+    return `<div class="wfr${isCare?' care':''}${miss?' miss':''}">
+      <span class="n" title="${esc(LABELS[item]||item)}">${esc(LABELS[item]||item)}</span>
+      <span class="wftrack">${miss||isCare?'':`<i style="width:${(100*pts/mx).toFixed(1)}%"></i>`}</span>
+      <span class="v">${val}</span></div>`;
+  }).join('');
+  return `<div class="wf">${rows}</div>
+    <div class="wfnote"><b>${r.geri_b.removed_points} of 100 points withdrawn from severity.</b>
+    Struck rows record care received, not disease. They score nothing here and are reported
+    instead as the Access-Contamination Index. Dashed rows were never recorded — they are
+    excluded from the denominator, never scored as zero.</div>`;
+}
+
+/* ============================ results ============================ */
+const QNAME={routine:'Routine surveillance',escalate:'Escalate and monitor',
+ escalate_and_navigate:'Escalate and navigate',
+ equity_flag:'Equity flag — do not act on the score',not_scoreable:'Not scoreable'};
+
+function render(){
+  const r=score(P), g=r.geri_r;
+  const gaps=[...new Set([].concat(r.mci.gaps['0'],r.mci.gaps['1'],r.mci.gaps['2'],r.mci.gaps['3']))];
+  const bandCol = {Low:'var(--sev-1)',Moderate:'var(--sev-2)',High:'var(--sev-3)','Very high':'var(--sev-4)'}[g.band]||'var(--ink-3)';
+  const tiles=[
+    ['12-month risk', g.risk_12mo===null?'—':num(100*g.risk_12mo,0)+'<small>%</small>',
+      g.band?esc(g.band)+' band'+(g.risk_24mo===null?'':' · '+num(100*g.risk_24mo,0)+'% at 24 mo'):'not scoreable',
+      g.risk_12mo===null?0:100*g.risk_12mo, bandCol, 'risk'],
+    ['GERI-B', num(r.geri_b.score,0), 'biology-anchored severity, 0–100',
+      r.geri_b.score||0, 'var(--accent)', 'b'],
+    ['ACI', num(r.aci.score,0),
+      r.aci.score>=r.aci.threshold?'above the '+r.aci.threshold+' threshold':'below the '+r.aci.threshold+' threshold',
+      r.aci.score, 'var(--flag)', 'aci'],
+    ['DSI', r.dsi.total===null?'—':String(r.dsi.total),
+      r.dsi.total===null?'incomplete'+(r.dsi.endoscopy_missing?' — no endoscopy':''):'published index · threshold '+r.dsi.threshold,
+      r.dsi.total===null?0:r.dsi.total, 'var(--ink-3)', 'dsi'],
+  ];
+  document.getElementById('out').innerHTML=`
+   <div class="verdict" data-q="${r.quadrant}">
+     <div class="vtop"><span class="vlabel">Recommended action</span>
+       <span class="vtier">${esc(r.mci.tier_name)} · ${num(r.mci.coverage_pct,0)}% of fields</span></div>
+     <div class="vname">${esc(QNAME[r.quadrant])}</div>
+     <p>${esc(r.action)}</p></div>
+
+   <div class="tiles">${tiles.map(t=>`
+     <div class="tile" data-key="${t[5]}">
+       <div class="tl">${t[0]}</div>
+       <div class="tv" style="color:${t[4]}">${t[1]}</div>
+       <div class="tn">${t[2]}</div>
+       <div class="spark"><i style="width:${clamp(t[3],0,100)}%;background:${t[4]}"></i></div>
+     </div>`).join('')}</div>
+
+   <div class="sec"><div class="sech">Risk against access contamination</div>${quadrantSVG(r)}</div>
+
+   ${r.alert.fired?`<div class="sec"><div class="sech">Phenotype alerts<em>fire regardless of score</em></div>
+     <ul class="flags">${r.alert.reasons.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+
+   ${r.aci.barrier_hits.length?`<div class="sec"><div class="sech">Access barriers recorded<em>${r.aci.barrier_hits.length} of 9</em></div>
+     <ul class="flags barrier">${r.aci.barrier_hits.map(h=>`<li>${esc(h.label)}</li>`).join('')}</ul></div>`:''}
+
+   <div class="sec"><div class="sech">Where the points come from<em>${r.subtype==='CD'?"Crohn's":'Ulcerative colitis'} index</em></div>${waterfall(r)}</div>
+
+   <div class="sec"><div class="sech">Working</div>
+     <table class="kv">
+       <tr><td>Expected advanced therapy, given this biology</td><td>${num(100*r.aci.expected_care,0)}%</td></tr>
+       <tr><td>Advanced therapy actually received</td><td>${r.aci.observed_care===null?'not recorded':(r.aci.observed_care?'yes':'no')}</td></tr>
+       <tr><td>Care deficit</td><td>${num(100*r.aci.care_deficit,0)}%</td></tr>
+       <tr><td>Structural barrier load</td><td>${num(100*r.aci.structural_barrier,0)}%</td></tr>
+       <tr><td>Severity points scored / attainable</td><td>${num(r.geri_b.score*r.geri_b.attainable/100,1)} / ${r.geri_b.attainable}</td></tr>
+       ${r.constitutional.parts.map(p=>`<tr><td>${esc(p.source)} — ${esc(p.detail)}</td><td>${p.log_odds>=0?'+':''}${num(p.log_odds,2)} log-odds</td></tr>`).join('')}
+       ${r.constitutional.suppressed_by_tier?`<tr><td>Genomic layer</td><td>suppressed below Tier 3</td></tr>`:''}
+       ${gaps.length?`<tr><td>Not recorded</td><td class="wrap-r">${gaps.map(k=>esc(LABELS[k]||k)).join(', ')}</td></tr>`:''}
+     </table></div>
+
+   <div class="sec"><p class="muted">${esc(r.disclaimer)} Coefficients <code>${esc(r.coefficient_version)}</code>.
+     Serology is not conditioned on ancestry: Bertha et&nbsp;al. (2018) found no interaction between
+     European admixture and outcome, so the markers enter unmodified.</p></div>`;
+
+  // Flash any readout whose value moved — flipping "biologic: used → never" should be visible.
+  const now={risk:g.risk_12mo,b:r.geri_b.score,aci:r.aci.score,dsi:r.dsi.total};
+  if(PREV) Object.keys(now).forEach(k=>{
+    if(now[k]!==PREV[k]){
+      const el=document.querySelector(`.tile[data-key="${k}"]`);
+      if(el){el.classList.remove('moved');void el.offsetWidth;el.classList.add('moved');}
+    }
+  });
+  PREV=now;
+}
+
+/* ============================ wiring ============================ */
+function setSubtype(s){
+  P.subtype=s;
+  document.getElementById('btnCD').setAttribute('aria-pressed',String(s==='CD'));
+  document.getElementById('btnUC').setAttribute('aria-pressed',String(s==='UC'));
+  renderForm(); render();
+}
+document.getElementById('btnCD').onclick=()=>setSubtype('CD');
+document.getElementById('btnUC').onclick=()=>setSubtype('UC');
+document.getElementById('btnClear').onclick=()=>{P={subtype:P.subtype};PREV=null;
+  document.getElementById('caseSel').value='';renderForm();render();};
+document.getElementById('btnPrint').onclick=()=>window.print();
+document.getElementById('btnJSON').onclick=()=>{
+  const txt=JSON.stringify({patient:P,result:score(P)},null,2);
+  const w=window.open('','_blank');
+  if(w){w.document.write('<title>GERI export</title><pre style="white-space:pre-wrap;font:12px ui-monospace,monospace;padding:18px;line-height:1.5">'
+    +txt.replace(/[&<]/g,c=>({'&':'&amp;','<':'&lt;'}[c]))+'</pre>');w.document.close();}
+};
+const sel=document.getElementById('caseSel');
+sel.innerHTML='<option value="">Load an example case…</option>'
+  +Object.keys(CASES).map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('');
+sel.onchange=()=>{ const c=CASES[sel.value]; if(!c)return; P={...c}; PREV=null; setSubtype(P.subtype); };
+
+/* Open in a working state: the case the index exists for. */
+P={...CASES["Equity quadrant — severe biology, never offered advanced therapy"]};
+sel.value="Equity quadrant — severe biology, never offered advanced therapy";
+setSubtype(P.subtype);
+</script>
